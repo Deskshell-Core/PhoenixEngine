@@ -3,5 +3,4 @@
 *.dylib
 out/*
 libchromiumcontent_mac/*
-.build_+
-.ninja_*
+.build_cache
