@@ -36,7 +36,7 @@
 	url = https://github.com/joyent/http-parser.git
 [submodule "re2c"]
 	path = re2c
-	url = ./re2c
+	url = git://git.code.sf.net/p/re2c/code-git
 [submodule "libucl"]
 	path = libucl
 	url = https://github.com/vstakhov/libucl.git
