@@ -1,0 +1,16 @@
+CFLAGS += " -Iph7";
+CXXFLAGS += " -Iph7";
+
+target OUT+"/libph7.a" {
+	input "ph7/ph7.c";
+	rule "lib";
+	tag "libph7";
+}
+
+target OUT+"/ph7" {
+	input "ph7/examples/ph7_interp.c";
+	rule "exe";
+	requires [targets("libph7")];
+	LDFLAGS += " -lph7";
+	tag "ph7";
+}

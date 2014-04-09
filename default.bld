@@ -29,6 +29,7 @@ include "./.IceTea/ttvfs.bld";
 include "./.IceTea/utils.bld";
 include "./.IceTea/libcanister.bld";
 include "./.IceTea/libucl.bld";
+include "./.IceTea/ph7.bld";
 
 // Need PHP first...which depends on checks and generator.
 // include "./.IceTea/php.bld";
@@ -98,6 +99,7 @@ action "all" { build: [targets()]; }
 action "default" { build: [targets("phoenix_engine")]; }
 action "test" { build: [targets("test")]; }
 action "clean" { clean: [targets()]; }
+action "tools" { build: [targets("ph7"),targets("re2c")]; }
 
 // OS X stuff
 action "clean-framework" {
