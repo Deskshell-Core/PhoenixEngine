@@ -1,42 +1,42 @@
 [submodule "php"]
 	path = php
-	url = ./php
+	url = https://github.com/php/php-src.git
 [submodule "ph7"]
 	path = ph7
-	url = ./ph7
+	url = https://github.com/symisc/PH7.git
 [submodule "PHP-CPP"]
 	path = PHP-CPP
-	url = ./PHP-CPP/
+	url = https://github.com/CopernicaMarketingSoftware/PHP-CPP.git
 [submodule "FLTK"]
 	path = FLTK
-	url = ./FLTK
+	url = https://github.com/IngwiePhoenix/FLTK.git
 [submodule "uvpp"]
 	path = uvpp
-	url = ./uvpp
+	url = https://github.com/larroy/uvpp.git
 [submodule "libuv"]
 	path = libuv
-	url = ./libuv
+	url = https://github.com/joyent/libuv.git
 [submodule "Trololo"]
 	path = Trololo
-	url = ./Trololo/
+	url = https://github.com/benvh/Trololo.git
 [submodule "ttvfs"]
 	path = ttvfs
-	url = ./ttvfs
+	url = https://github.com/fgenesis/ttvfs.git
 [submodule "build"]
 	path = build
-	url = ./build
+	url = https://github.com/IngwiePhoenix/build.git
 [submodule "libbu"]
 	path = libbu
-	url = ./libbu
+	url = https://github.com/eichlan/libbu.git
 [submodule "libcanister"]
 	path = libcanister
-	url = ./libcanister/
+	url = https://github.com/coder543/libcanister.git
 [submodule "http-parser"]
 	path = http-parser
-	url = ./http-parser/
+	url = https://github.com/joyent/http-parser.git
 [submodule "re2c"]
 	path = re2c
 	url = ./re2c
 [submodule "libucl"]
 	path = libucl
-	url = ./libucl/
+	url = https://github.com/vstakhov/libucl.git
