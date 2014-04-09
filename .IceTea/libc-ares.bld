@@ -1,0 +1,74 @@
+CFLAGS += " -Ic-ares/include";
+CXXFLAGS += " -Ic-ares/include";
+
+target OUT+"/libc-ares.a" {
+	CFLAGS += " -Ic-ares/src -DHAVE_CONFIG_H -DCARES_STATICLIB";
+	SRC = [
+        "c-ares/src/ares_cancel.c",
+        "c-ares/src/ares__close_sockets.c",
+        "c-ares/src/ares_create_query.c",
+        "c-ares/src/ares_data.c",
+        "c-ares/src/ares_destroy.c",
+        "c-ares/src/ares_expand_name.c",
+        "c-ares/src/ares_expand_string.c",
+        "c-ares/src/ares_fds.c",
+        "c-ares/src/ares_free_hostent.c",
+        "c-ares/src/ares_free_string.c",
+        "c-ares/src/ares_gethostbyaddr.c",
+        "c-ares/src/ares_gethostbyname.c",
+        "c-ares/src/ares__get_hostent.c",
+        "c-ares/src/ares_getnameinfo.c",
+        "c-ares/src/ares_getopt.c",
+        "c-ares/src/ares_getsock.c",
+        "c-ares/src/ares_init.c",
+        "c-ares/src/ares_library_init.c",
+        "c-ares/src/ares_llist.c",
+        "c-ares/src/ares_mkquery.c",
+        "c-ares/src/ares_nowarn.c",
+        "c-ares/src/ares_options.c",
+        "c-ares/src/ares_parse_aaaa_reply.c",
+        "c-ares/src/ares_parse_a_reply.c",
+        "c-ares/src/ares_parse_mx_reply.c",
+        "c-ares/src/ares_parse_naptr_reply.c",
+        "c-ares/src/ares_parse_ns_reply.c",
+        "c-ares/src/ares_parse_ptr_reply.c",
+        "c-ares/src/ares_parse_soa_reply.c",
+        "c-ares/src/ares_parse_srv_reply.c",
+        "c-ares/src/ares_parse_txt_reply.c",
+        "c-ares/src/ares_process.c",
+        "c-ares/src/ares_query.c",
+        "c-ares/src/ares__read_line.c",
+        "c-ares/src/ares_search.c",
+        "c-ares/src/ares_send.c",
+        "c-ares/src/ares_strcasecmp.c",
+        "c-ares/src/ares_strdup.c",
+        "c-ares/src/ares_strerror.c",
+        "c-ares/src/ares_timeout.c",
+        "c-ares/src/ares__timeval.c",
+        "c-ares/src/ares_version.c",
+        "c-ares/src/ares_writev.c",
+        "c-ares/src/bitncmp.c",
+        "c-ares/src/inet_net_pton.c",
+        "c-ares/src/inet_ntop.c"
+	];
+      
+    // OS stuff...
+    if OS() == "win" then {
+    	CFLAGS += " -Ic-ares/config/win32";
+    	LDFLAGS += " -lws2_32.lib -liphlpapi.lib";
+      	SRC += [
+      		"c-ares/src/windows_port.c",
+            "c-ares/src/ares_getenv.c",
+            "c-ares/src/ares_platform.c"
+      	];
+    } else {
+    	CFLAGS += " -g -pedantic -Wall -Wextra -Wno-unused-parameter";
+    	CFLAGS += " --std=gnu89";
+		if OS() == "linux" then { CFLAGS += " -Ic-ares/config/linux"; }
+		else { CFLAGS += " -Ic-ares/config/darwin"; }
+    }
+    
+    rule "lib";
+    input [SRC];
+    tag "c-ares";
+}

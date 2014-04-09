@@ -1,0 +1,42 @@
+[submodule "php"]
+	path = php
+	url = ./php
+[submodule "ph7"]
+	path = ph7
+	url = ./ph7
+[submodule "PHP-CPP"]
+	path = PHP-CPP
+	url = ./PHP-CPP/
+[submodule "FLTK"]
+	path = FLTK
+	url = ./FLTK
+[submodule "uvpp"]
+	path = uvpp
+	url = ./uvpp
+[submodule "libuv"]
+	path = libuv
+	url = ./libuv
+[submodule "Trololo"]
+	path = Trololo
+	url = ./Trololo/
+[submodule "ttvfs"]
+	path = ttvfs
+	url = ./ttvfs
+[submodule "build"]
+	path = build
+	url = ./build
+[submodule "libbu"]
+	path = libbu
+	url = ./libbu
+[submodule "libcanister"]
+	path = libcanister
+	url = ./libcanister/
+[submodule "http-parser"]
+	path = http-parser
+	url = ./http-parser/
+[submodule "re2c"]
+	path = re2c
+	url = ./re2c
+[submodule "libucl"]
+	path = libucl
+	url = ./libucl/

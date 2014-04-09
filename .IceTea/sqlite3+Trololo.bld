@@ -1,0 +1,32 @@
+CFLAGS += " -Isqlite3";
+CXXFLAGS += " -Isqlite3";
+
+target OUT+"/libsqlite3.a" {
+	input ["sqlite3/sqlite3.c"];
+	rule "lib";
+	tag "sqlite3";
+}
+
+target OUT+"/sqlite3_shell" {
+	requires [targets("sqlite3")];
+	input ["sqlite3/shell.c"];
+	LDFLAGS += " -lsqlite3";
+}
+
+// Add the Trololo stuff!! :D
+CXXFLAGS += " -ITrololo";
+
+target OUT+"/libtrololo.a" {
+	input ["Trololo/SqliteDatabase.cc", "Trololo/QueryResult.cc"];
+	rule "lib";
+	tag "sqlite3";
+}
+
+target OUT+"/Trololo_test" {
+	tag "test";
+	input ["Trololo/test.cc"];
+	rule "exe";
+	requires [targets("sqlite3")];
+	LDFLAGS += " -lsqlite3 -ltrololo";
+	tag "libtrololo";
+}

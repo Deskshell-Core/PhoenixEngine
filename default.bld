@@ -1,0 +1,112 @@
+if enable_debug != null then {
+	print("-- Debug enabled.");
+	BUILD_TYPE="Debug";
+} else {
+	BUILD_TYPE="Release";
+}
+// we define that for any case.
+OUT = "./out";
+// OBJ_DIR = "./obj";
+LDFLAGS += " -L"+OUT+" -Llibchromiumcontent_"+OS()+"/"+BUILD_TYPE;
+CFLAGS += " -fPIC -fno-common";
+CXXFLAGS += " -fPIC -fno-common";
+CHROMIUM_INCLUDE = " -Ilibchromiumcontent_"+OS()+"/src";
+
+if !exists(OUT) then { /*mkdir(OUT);*/ execute("mkdir "+OUT); }
+// if !exists(OBJ_DIR) then { /*mkdir(OUT);*/ execute("mkdir "+OBJ_DIR); }
+
+// NodeJS dependencies
+include "./.IceTea/libuv.bld";
+include "./.IceTea/libhttp-parser.bld";
+include "./.IceTea/libc-ares.bld";
+
+// PHP dependencies
+include "./.IceTea/sqlite3+Trololo.bld";
+include "./.IceTea/re2c.bld";
+
+// Engine specific stuff
+include "./.IceTea/ttvfs.bld";
+include "./.IceTea/utils.bld";
+include "./.IceTea/libcanister.bld";
+include "./.IceTea/libucl.bld";
+
+// Need PHP first...which depends on checks and generator.
+// include "./.IceTea/php.bld";
+
+// Need proper path handling...
+// include "./libbu/default.bld";
+// include "./build/default.bld";
+// include "./.IceTea/libbu.bld";
+
+// About to come...
+/*
+	ph7.bld
+	fltk.bld
+	standart build files will be improved.
+	PHP extensions:
+		php-uv
+		php-v8js
+		php-pthreads
+	Own extensions:
+		php-phoenix-ipc
+		php-phoenix-gui
+	nodejs.bld
+	nodejs native extensions:
+		node-tagg
+		node-ph7 (cause we can)
+		node-phoenix-gui
+		node-phoenix-ipc
+		nodejs-async
+*/
+
+// Very super-duper special... :)
+if OS() == "mac" then {
+	target OUT+"/libPhoenixEngine.dylib" {
+		display "dylib";
+		tag "phoenix_engine";
+		profile "build" {
+			execute("${CXX} -dynamiclib -all_load out/*.a -o "+OUTPUT, "g++");
+		}
+		requires [
+			targets("http-parser"),
+			targets("c-ares"),
+			targets("libuv"),
+			targets("ttvfs"),
+			targets("libcanister"),
+			targets("libucl"),
+			targets("sqlite3"),
+			targets("libtrololo")
+		];
+	}
+	target OUT+"/PhoenixEngine.framework" {
+		display "Framework";
+		requires [targets("phoenix_engine")];
+		tag "PEFramework";
+		profile "build" {
+			for dir in [OUTPUT, OUTPUT+"/Resources", OUTPUT+"/Libraries"] do {
+				execute("mkdir -p '"+dir+"'");
+			}
+			execute("cp '"+OUT+"/libPhoenixEngine.dylib' '"+OUTPUT+"/Phoenix Engine'");
+		}
+		profile "clean" {
+			execute("rm -rf '"+OUTPUT+"'");
+		}
+	}
+}
+
+action "all" { build: [targets()]; }
+action "default" { build: [targets("phoenix_engine")]; }
+action "test" { build: [targets("test")]; }
+action "clean" { clean: [targets()]; }
+
+// OS X stuff
+action "clean-framework" {
+	if OS() == "mac" then {
+		clean: [targets("PEFramework")];
+	}
+}
+action "build-framework" {
+	if OS() == "mac" then {
+		build: [targets("PEFramework")];
+	}
+}

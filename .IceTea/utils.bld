@@ -1,0 +1,11 @@
+target OUT+"/v8Version" {
+	rule "exe";
+	input "util/v8Version.cpp";
+	tag "util";
+	CXXFLAGS += CHROMIUM_INCLUDE;
+	LDFLAGS += " -lchromiumcontent";
+	/* Remember to set
+		DYLD_LIBRARY_PATH=path/to/libchromiumcontent/Release|Debug
+		to run the binary!
+	*/
+}

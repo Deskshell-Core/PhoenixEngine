@@ -1,0 +1,98 @@
+// Publics
+CFLAGS += " -Ilibuv/include";
+CXXFLAGS += " -Ilibuv/include";
+
+// Implement uvpp...
+CXXFLAGS += " -Iuvpp";
+
+target OUT+"/libuv.a" {
+	CFLAGS += " -pthread -DHAVE_CONFIG_H";
+	CFLAGS += " -Ilibuv/include -Ilibuv/src";
+	if OS() == "mac" then { CFLAGS += " -D_DARWIN_USE_64_BIT_INODE=1"; }
+	if OS() == "linux" then { CFLAGS += " -D_POSIX_C_SOURCE=200112"; }
+	/* We dont have a windows handle, yet. But it would define:
+		_LARGEFILE_SOURCE
+        _FILE_OFFSET_BITS=64
+        _WIN32_WINNT=0x0600
+        _GNU_SOURCE
+	*/
+	
+	// Work the sources
+	SRC = [ files("libuv/src/*.c") ];
+	
+	// Conditional sources
+	if OS() == "win" then {
+		SRC += [ files("libuv/src/win/*.c") ];
+		LDFLAGS += "-ladvapi32.lib -liphlpapi.lib -lpsapi.lib -lshell32.lib -lws2_32.lib";
+	} else {
+		CFLAGS += " -g --std=gnu89 -pedantic -Wall -Wextra -Wno-unused-parameter";
+		SRC += [
+            "libuv/src/unix/async.c",
+            "libuv/src/unix/core.c",
+            "libuv/src/unix/dl.c",
+            "libuv/src/unix/fs.c",
+            "libuv/src/unix/getaddrinfo.c",
+            "libuv/src/unix/loop.c",
+            "libuv/src/unix/loop-watcher.c",
+            "libuv/src/unix/pipe.c",
+            "libuv/src/unix/poll.c",
+            "libuv/src/unix/process.c",
+            "libuv/src/unix/signal.c",
+            "libuv/src/unix/stream.c",
+            "libuv/src/unix/tcp.c",
+            "libuv/src/unix/thread.c",
+            "libuv/src/unix/threadpool.c",
+            "libuv/src/unix/timer.c",
+            "libuv/src/unix/tty.c",
+            "libuv/src/unix/udp.c",
+            "libuv/src/unix/proctitle.c" 
+		];
+		// A check for solaris is not implemented yet.
+		LDFLAGS += " -pthread";
+	}
+	if OS() == "mac" then {
+		SRC += [
+            "libuv/src/unix/darwin.c",
+            "libuv/src/unix/fsevents.c",
+            "libuv/src/unix/darwin-proctitle.c",
+            "libuv/src/unix/kqueue.c" 
+		];
+		// missing:  "-Wstrict-aliasing" 
+	} else if OS() == "linux" then {
+		SRC += [
+            "libuv/src/unix/linux-core.c",
+            "libuv/src/unix/linux-inotify.c",
+            "libuv/src/unix/linux-syscalls.c",
+            "libuv/src/unix/linux-syscalls.h"
+		];
+		LDFLAGS += " -ldl -lrt";
+	}
+	
+	// Set up the target
+	rule "lib";
+	input [SRC];
+	tag "libuv";
+}
+
+target OUT+"/libuv_test" {
+	requires [targets("libuv")];
+	LDFLAGS += OUT+"/libuv.a -lm";
+	SRC = [
+        "libuv/test/blackhole-server.c",
+        "libuv/test/echo-server.c",
+        "libuv/test/run-tests.c",
+        "libuv/test/runner.c",
+        files("libuv/test/test-*.c")
+	];
+	if OS() == "windows" then {
+		SRC += [ "test/runner-win.c" ];
+		LDFLAGS = LDFLAGS.lib("ws2_32.lib");
+	} else {
+		SRC += [ "libuv/test/runner-unix.c" ];
+		CFLAGS += " -D_GNU_SOURCE";
+	}
+	
+	rule "exe";
+	input [SRC];
+	tag "test";
+}

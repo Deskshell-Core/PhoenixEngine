@@ -1,0 +1,22 @@
+// Publics
+CXXFLAGS += " -Ilibcanister";
+
+target OUT+"/libcanister.a" {
+	tag "libcanister";
+	input [
+		files("libcanister/lib*.cpp"),
+		"libcanister/bzipWrapper.cpp",
+		"libcanister/fileinterpretation.cpp"
+	];
+	rule "lib";
+}
+
+target OUT+"/candemo" {
+	tag "test";
+	requires [targets("libcanister")];
+	input [
+		"libcanister/canisterdemo.cpp"
+	];
+	rule "exe";
+	LDFLAGS += " -lcanister";
+}

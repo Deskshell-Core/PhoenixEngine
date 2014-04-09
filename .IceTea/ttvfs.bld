@@ -1,0 +1,22 @@
+CXXFLAGS += " -Ittvfs/ttvfs -Ittvfs/ttvfs_zip";
+
+target OUT+"/libttvfs.a" {
+	rule "lib";
+	input [
+		files("ttvfs/ttvfs/*.cpp"),
+		files("ttvfs/ttvfs_zip/*.cpp"),
+		files("ttvfs/ttvfs_zip/*.c")
+	];
+	tag "ttvfs";
+}
+
+for example in [files("ttvfs/examples/example*.cpp")] do {
+	target OUT+"/ttvfs_"+example.fileName().replace(".cpp","") {
+		rule "exe";
+		input [example];
+		CXXFLAGS += " -Ittvfs/examples";
+		LDFLAGS += " -lttvfs";
+		tag "test";
+		requires [targets("ttvfs")];
+	}
+}

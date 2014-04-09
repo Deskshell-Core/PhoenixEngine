@@ -1,0 +1,36 @@
+INC_DIRS += " -Iphp/main -Iphp/TSRM -Iphp/Zend";
+CXXFLAGS += INC_DIRS;
+CFLAGS += INC_DIRS;
+CXXFLAGS += " -IPHP-CPP -std=c++11";
+
+// In order to fully support PHP-CPP...
+PHP_CONFIG = "php-config";
+PHP_BIN = "$(${PHP_CONFIG} --php-bin)";
+PHPCPP_LDFLAGS += "$(${PHP_CONFIG} --ldflags)";
+
+// Needs configuring and generating.
+/*target OUT+"/libphp5.a" {...}*/
+
+target "PHP-CPP/config_util" {
+	input [files("PHP-CPP/config/*.cpp")];
+	rule "exe";
+	tag "phpcpp_config";
+}
+
+target "PHP-CPP/config.h" {
+	requires ["PHP-CPP/config_util"];
+	tag "phpcpp_config_h";
+	display "Generating";
+	profile "build" {
+		execute(
+			"./PHP-CPP/config_util > "+OUTPUT, 
+			fileName("PHP-CPP/config_util")
+		);
+	}
+}
+
+target OUT+"/libphp-cpp.a" {
+	CXXFLAGS += " -fpic -IPHP-CPP/src/";
+	requires ["phpcpp_config_h"];
+	input [files("PHP-CPP/src/*.cpp")];
+}

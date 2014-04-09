@@ -1,0 +1,16 @@
+CFLAGS += " -Ihttp-parser";
+CXXFLAGS += " -Ihttp-parser";
+
+target OUT+"/libhttp-parser.a" {
+	rule "lib";
+	input "http-parser/http_parser.c";
+	tag "http-parser";
+}
+
+target OUT+"/http-parser_test" {
+	rule "exe";
+	requires [targets("http-parser")];
+	input "http-parser/test.c";
+	tag "test";
+	LDFLAGS += " -lhttp-parser";
+}

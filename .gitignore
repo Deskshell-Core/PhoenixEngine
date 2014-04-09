@@ -1,0 +1,5 @@
+*.a
+*.o
+*.dylib
+out/*
+libchromiumcontent_mac/*
