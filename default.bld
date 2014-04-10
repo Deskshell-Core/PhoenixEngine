@@ -8,8 +8,8 @@ if enable_debug != null then {
 OUT = "./out";
 // OBJ_DIR = "./obj";
 LDFLAGS += " -L"+OUT+" -Llibchromiumcontent_"+OS()+"/"+BUILD_TYPE;
-CFLAGS += " -fPIC -fno-common";
-CXXFLAGS += " -fPIC -fno-common";
+CFLAGS += " -fPIC -fno-common -Wno-pointer-sign";
+CXXFLAGS += " -fPIC -fno-common -Wno-pointer-sign";
 CHROMIUM_INCLUDE = " -Ilibchromiumcontent_"+OS()+"/src";
 
 if !exists(OUT) then { /*mkdir(OUT);*/ execute("mkdir "+OUT); }
@@ -98,7 +98,6 @@ if OS() == "mac" then {
 action "all" { build: [targets()]; }
 action "default" { build: [targets("phoenix_engine")]; }
 action "test" { build: [targets("test")]; }
-action "clean" { clean: [targets()]; }
 action "tools" { build: [targets("ph7"),targets("re2c")]; }
 
 // OS X stuff
@@ -112,3 +111,6 @@ action "build-framework" {
 		build: [targets("PEFramework")];
 	}
 }
+
+action "libucl" { build: [targets("libucl")]; }
+action "libucl-clean" { clean: [targets("libucl")]; }
