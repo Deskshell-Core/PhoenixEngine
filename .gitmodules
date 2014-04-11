@@ -1,9 +1,6 @@
 [submodule "php"]
 	path = php
 	url = https://github.com/php/php-src.git
-[submodule "ph7"]
-	path = ph7
-	url = https://github.com/symisc/PH7.git
 [submodule "PHP-CPP"]
 	path = PHP-CPP
 	url = https://github.com/CopernicaMarketingSoftware/PHP-CPP.git
@@ -40,3 +37,6 @@
 [submodule "libucl"]
 	path = libucl
 	url = https://github.com/vstakhov/libucl.git
+[submodule "objectscript"]
+	path = objectscript
+	url = https://github.com/unitpoint/objectscript.git

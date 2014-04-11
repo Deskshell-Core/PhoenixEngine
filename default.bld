@@ -29,7 +29,7 @@ include "./.IceTea/ttvfs.bld";
 include "./.IceTea/utils.bld";
 include "./.IceTea/libcanister.bld";
 include "./.IceTea/libucl.bld";
-include "./.IceTea/ph7.bld";
+include "./.IceTea/objectscript.bld";
 
 // Need PHP first...which depends on checks and generator.
 // include "./.IceTea/php.bld";
@@ -69,14 +69,17 @@ if OS() == "mac" then {
 			execute("${CXX} -dynamiclib -all_load out/*.a -o "+OUTPUT, "g++");
 		}
 		requires [
+			# nodejs
 			targets("http-parser"),
 			targets("c-ares"),
 			targets("libuv"),
+			# extras
 			targets("ttvfs"),
 			targets("libcanister"),
 			targets("libucl"),
 			targets("sqlite3"),
-			targets("libtrololo")
+			targets("libtrololo"),
+			targets("libobjectscript")
 		];
 	}
 	target OUT+"/PhoenixEngine.framework" {
@@ -90,7 +93,8 @@ if OS() == "mac" then {
 			execute("cp '"+OUT+"/libPhoenixEngine.dylib' '"+OUTPUT+"/Phoenix Engine'");
 		}
 		profile "clean" {
-			execute("rm -rf '"+OUTPUT+"'");
+			print("Meep.");
+			execute("rm -rf '"+OUTPUT+"'","rm");
 		}
 	}
 }
@@ -106,7 +110,7 @@ action "clean-framework" {
 		clean: [targets("PEFramework")];
 	}
 }
-action "build-framework" {
+action "framework" {
 	if OS() == "mac" then {
 		build: [targets("PEFramework")];
 	}
@@ -114,3 +118,8 @@ action "build-framework" {
 
 action "libucl" { build: [targets("libucl")]; }
 action "libucl-clean" { clean: [targets("libucl")]; }
+
+action "rebuild" {
+	clean: [targets("phoenix_engine")];
+	build: [targets("phoenix_engine")];
+}
