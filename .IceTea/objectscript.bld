@@ -1,0 +1,62 @@
+CXXFLAGS += " -Iobjectscript/src";
+OS_SRC_DIR = "objectscript/src";
+for d in [
+	OS_SRC_DIR+"/ext-process",
+	OS_SRC_DIR+"/ext-filesystem",
+	OS_SRC_DIR+"/ext-url",
+	OS_SRC_DIR+"/ext-base64",
+	OS_SRC_DIR+"/ext-datetime",
+	OS_SRC_DIR+"/ext-json"
+] do {
+	target OUT+"/libos_"+d.fileName()+".a" {
+		rule "lib";
+		input [files(d+"/*.cpp")];
+		tag "os-ext";
+		CXXFLAGS += " -I"+d;
+	}
+}
+
+// Hashlib is a bit extra-y...
+target OUT+"/libos_ext-hashlib.a" {
+	input [
+		files(OS_SRC_DIR+"/ext-hashlib/*.cpp"),
+		files(OS_SRC_DIR+"/ext-hashlib/sha/*.cpp"),
+		files(OS_SRC_DIR+"/ext-hashlib/des/*.cpp"),
+		files(OS_SRC_DIR+"/ext-hashlib/md5/*.cpp")
+	];
+	CXXFLAGS += " -I"+OS_SRC_DIR+"/ext-hashlib/sha";
+	CXXFLAGS += " -I"+OS_SRC_DIR+"/ext-hashlib/des";
+	CXXFLAGS += " -I"+OS_SRC_DIR+"/ext-hashlib/md5";
+
+	rule "lib";
+	tag "os-ext";	
+}
+
+// Aaaand the engine itself!
+target OUT+"/libos.a" {
+	input [
+		OS_SRC_DIR+"/objectscript.cpp",
+		OS_SRC_DIR+"/os-heap.cpp"
+	];
+	rule "lib";
+	tag "libos";
+}
+
+// The real thing. :)
+target OUT+"/os" {
+	rule "exe";
+	input [
+		OS_SRC_DIR+"/../os.cpp"
+	];
+	
+	// We configure this stuff via flags.
+	CXXFLAGS += " -DOS_CURL_DISABLED -DOS_SQLITE3_DISABLED -DOS_REGEXP_DISABLED";
+	CXXFLAGS += " -DOS_ICONV_DISABLED -DOS_ZLIB_DISABLED -DOS_ODBO_DISABLED";
+	LDFLAGS += " -los_ext-process -los_ext-filesystem";
+	LDFLAGS += " -los_ext-hashlib -los_ext-url";
+	LDFLAGS += " -los_ext-base64 -los_ext-datetime";
+	LDFLAGS += " -los_ext-json -lpthread";
+	
+	tag "os";
+	requires [targets("os-ext")];
+}

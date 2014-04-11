@@ -39,4 +39,4 @@
 	url = https://github.com/vstakhov/libucl.git
 [submodule "objectscript"]
 	path = objectscript
-	url = https://github.com/unitpoint/objectscript.git
+	url = https://github.com/IngwiePhoenix/objectscript.git

@@ -78,8 +78,8 @@ if OS() == "mac" then {
 			targets("libcanister"),
 			targets("libucl"),
 			targets("sqlite3"),
-			targets("libtrololo"),
-			targets("libobjectscript")
+			targets("libtrololo") #,
+			#targets("libobjectscript")
 		];
 	}
 	target OUT+"/PhoenixEngine.framework" {
