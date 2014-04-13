@@ -55,8 +55,8 @@ target OUT+"/os" {
 	LDFLAGS += " -los_ext-process -los_ext-filesystem";
 	LDFLAGS += " -los_ext-hashlib -los_ext-url";
 	LDFLAGS += " -los_ext-base64 -los_ext-datetime";
-	LDFLAGS += " -los_ext-json -lpthread";
+	LDFLAGS += " -los_ext-json -los -lpthread";
 	
 	tag "os";
-	requires [targets("os-ext")];
+	requires [targets("libos"), targets("os-ext")];
 }

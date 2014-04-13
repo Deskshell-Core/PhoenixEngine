@@ -9,7 +9,7 @@ OUT = "./out";
 // OBJ_DIR = "./obj";
 LDFLAGS += " -L"+OUT+" -Llibchromiumcontent_"+OS()+"/"+BUILD_TYPE;
 CFLAGS += " -fPIC -fno-common -Wno-pointer-sign";
-CXXFLAGS += " -fPIC -fno-common -Wno-pointer-sign";
+CXXFLAGS += " -fPIC -fno-common -Wno-pointer-sign -g";
 CHROMIUM_INCLUDE = " -Ilibchromiumcontent_"+OS()+"/src";
 
 if !exists(OUT) then { /*mkdir(OUT);*/ execute("mkdir "+OUT); }
@@ -78,8 +78,9 @@ if OS() == "mac" then {
 			targets("libcanister"),
 			targets("libucl"),
 			targets("sqlite3"),
-			targets("libtrololo") #,
-			#targets("libobjectscript")
+			targets("libtrololo"),
+			targets("libos"),
+			targets("os-ext")
 		];
 	}
 	target OUT+"/PhoenixEngine.framework" {

@@ -40,3 +40,21 @@
 [submodule "objectscript"]
 	path = objectscript
 	url = https://github.com/IngwiePhoenix/objectscript.git
+[submodule "php-ext/embed2-sapi"]
+	path = php-ext/embed2-sapi
+	url = https://github.com/basvanbeek/embed2-sapi.git
+[submodule "php-ext/v8js"]
+	path = php-ext/v8js
+	url = https://github.com/preillyme/v8js.git
+[submodule "php-ext/pthreads"]
+	path = php-ext/pthreads
+	url = https://github.com/krakjoe/pthreads.git
+[submodule "php-ext/uv"]
+	path = php-ext/uv
+	url = https://github.com/chobie/php-uv.git
+[submodule "php-ext/jsond"]
+	path = php-ext/jsond
+	url = https://github.com/bukka/php-jsond.git
+[submodule "php-ext/yar"]
+	path = php-ext/yar
+	url = https://github.com/laruence/yar.git
