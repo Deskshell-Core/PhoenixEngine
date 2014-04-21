@@ -1,0 +1,27 @@
+// Build the examples!
+for fl_ex in [files("FLTK/examples/*.cxx")] do {
+	target OUT+"/fltk_example_static_"+fl_ex.fileName().replace(".cxx","") {
+		tag "demo";
+		rule "exe";
+		input [fl_ex];
+		LDFLAGS += " -lfltk -lfltk_image -lfltk_gl -lfltk_forms"; // Link staticaly, as this will work without the engine then.
+		requires [targets("libfltk"), targets("libfltk_gl"), targets("libfltk_forms"), targets("libfltk_image")];
+	}
+	target OUT+"/fltk_example_shared_"+fl_ex.fileName().replace(".cxx","") {
+		tag "demo";
+		rule "exe";
+		input [fl_ex];
+		LDFLAGS += " -lPhoenixEngine"; // :D
+		requires [targets("phoenix_engine")];
+	}
+}
+/*for fl_ex in [files("FLTK/test/*.cxx")] do {
+	target OUT+"/fltk_test_"+fl_ex.fileName().replace(".cxx","") {
+		tag "test";
+		rule "exe";
+		input [fl_ex];
+		CXXFLAGS += " -DTESTAREA_X=0 -DTESTAREA_Y=0 -DTESTAREA_W=600 -DTESTAREA_H=600";
+		LDFLAGS += " -lfltk -lfltk_image -lfltk_gl -lfltk_forms"; // Link staticaly, as this will work without the engine then.
+		requires [targets("libfltk"), targets("libfltk_gl"), targets("libfltk_forms"), targets("libfltk_image")];
+	}
+}*/

@@ -1,8 +1,8 @@
 [submodule "php"]
 	path = php
 	url = https://github.com/php/php-src.git
-[submodule "PHP-CPP"]
-	path = PHP-CPP
+[submodule "php-ext/PHP-CPP"]
+	path = php-ext/PHP-CPP
 	url = https://github.com/CopernicaMarketingSoftware/PHP-CPP.git
 [submodule "FLTK"]
 	path = FLTK
@@ -37,9 +37,6 @@
 [submodule "libucl"]
 	path = libucl
 	url = https://github.com/vstakhov/libucl.git
-[submodule "objectscript"]
-	path = objectscript
-	url = https://github.com/IngwiePhoenix/objectscript.git
 [submodule "php-ext/embed2-sapi"]
 	path = php-ext/embed2-sapi
 	url = https://github.com/basvanbeek/embed2-sapi.git
@@ -58,3 +55,15 @@
 [submodule "php-ext/yar"]
 	path = php-ext/yar
 	url = https://github.com/laruence/yar.git
+[submodule "php-ext/operator"]
+	path = php-ext/operator
+	url = https://github.com/php/pecl-php-operator.git
+[submodule "curl"]
+	path = curl
+	url = https://github.com/bagder/curl.git
+[submodule "TinyJS"]
+	path = TinyJS
+	url = https://github.com/pochi0701/TinyJS.git
+[submodule "cDetect"]
+	path = cDetect
+	url = https://github.com/IngwiePhoenix/cDetect.git

@@ -1,0 +1,18 @@
+rule "cDetect" {
+	// We define this to make future configuration easier!
+	input "*.c";
+	display "cDetect";
+	profile "build" {
+		// Make sure this is set.
+		if CDFLAGS == null then { CDFLAGS = " "; }
+		
+		// Compile, then run.
+		execute("${CC} -IcDetect/cdetect/cdetect ${INPUT} -o ${CDOUT}");
+		execute("${CDOUT} --quiet ${CDFLAGS}");
+	}
+	profile "clean" {
+		condition fileExists;
+		execute("rm ${OUTPUT}");
+		execute("rm ${CDOUT}");
+	}
+}

@@ -1,0 +1,277 @@
+CFLAGS += " -IFLTK -IFLTK/png";
+CXXFLAGS += " -IFLTK -IFLTK/png";
+
+// We also now add these.
+LDFLAGS += " -framework OpenGL -framework AGL -framework CoreAudio -framework ApplicationServices -framework Cocoa -ljpeg -lz";
+
+target [OUT+"/fltk.cflags","FLTK/config.h"] {
+	// Woo, double target.
+	rule "cDetect";
+	tag "configure";
+	input ["util/fltk_configure.c"];
+	
+	// Settings for the rule.
+	CDOUT = OUT+"/fltk_configure";
+	CDFLAGS = "--cache=cache.txt --out=FLTK/config.h";
+}
+
+// Now that we have a nice config.h file, lets make that mighty library a real thing.
+target OUT+"/libfltk.a" {
+	// Lets begin! We'll use the actual Makefiles constants
+	SRC = [
+		"FLTK/src/Fl.cxx",
+		"FLTK/src/Fl_Adjuster.cxx",
+		"FLTK/src/Fl_Bitmap.cxx",
+		"FLTK/src/Fl_Browser.cxx",
+		"FLTK/src/Fl_Browser_.cxx",
+		"FLTK/src/Fl_Browser_load.cxx",
+		"FLTK/src/Fl_Box.cxx",
+		"FLTK/src/Fl_Button.cxx",
+		"FLTK/src/Fl_Chart.cxx",
+		"FLTK/src/Fl_Check_Browser.cxx",
+		"FLTK/src/Fl_Check_Button.cxx",
+		"FLTK/src/Fl_Choice.cxx",
+		"FLTK/src/Fl_Clock.cxx",
+		"FLTK/src/Fl_Color_Chooser.cxx",
+		"FLTK/src/Fl_Counter.cxx",
+		"FLTK/src/Fl_Dial.cxx",
+		"FLTK/src/Fl_Device.cxx",
+		"FLTK/src/Fl_Double_Window.cxx",
+		"FLTK/src/Fl_File_Browser.cxx",
+		"FLTK/src/Fl_File_Chooser.cxx",
+		"FLTK/src/Fl_File_Chooser2.cxx",
+		"FLTK/src/Fl_File_Icon.cxx",
+		"FLTK/src/Fl_File_Input.cxx",
+		"FLTK/src/Fl_Group.cxx",
+		"FLTK/src/Fl_Help_View.cxx",
+		"FLTK/src/Fl_Image.cxx",
+		"FLTK/src/Fl_Input.cxx",
+		"FLTK/src/Fl_Input_.cxx",
+		"FLTK/src/Fl_Light_Button.cxx",
+		"FLTK/src/Fl_Menu.cxx",
+		"FLTK/src/Fl_Menu_.cxx",
+		"FLTK/src/Fl_Menu_Bar.cxx",
+		"FLTK/src/Fl_Menu_Button.cxx",
+		"FLTK/src/Fl_Menu_Window.cxx",
+		"FLTK/src/Fl_Menu_add.cxx",
+		"FLTK/src/Fl_Menu_global.cxx",
+		"FLTK/src/Fl_Multi_Label.cxx",
+		"FLTK/src/Fl_Native_File_Chooser.cxx",
+		"FLTK/src/Fl_Overlay_Window.cxx",
+		"FLTK/src/Fl_Pack.cxx",
+		"FLTK/src/Fl_Paged_Device.cxx",
+		"FLTK/src/Fl_Pixmap.cxx",
+		"FLTK/src/Fl_Positioner.cxx",
+		"FLTK/src/Fl_Preferences.cxx",
+		"FLTK/src/Fl_Printer.cxx",
+		"FLTK/src/Fl_Progress.cxx",
+		"FLTK/src/Fl_Repeat_Button.cxx",
+		"FLTK/src/Fl_Return_Button.cxx",
+		"FLTK/src/Fl_Roller.cxx",
+		"FLTK/src/Fl_Round_Button.cxx",
+		"FLTK/src/Fl_Scroll.cxx",
+		"FLTK/src/Fl_Scrollbar.cxx",
+		"FLTK/src/Fl_Shared_Image.cxx",
+		"FLTK/src/Fl_Single_Window.cxx",
+		"FLTK/src/Fl_Slider.cxx",
+		"FLTK/src/Fl_Table.cxx",
+		"FLTK/src/Fl_Table_Row.cxx",
+		"FLTK/src/Fl_Tabs.cxx",
+		"FLTK/src/Fl_Text_Buffer.cxx",
+		"FLTK/src/Fl_Text_Display.cxx",
+		"FLTK/src/Fl_Text_Editor.cxx",
+		"FLTK/src/Fl_Tile.cxx",
+		"FLTK/src/Fl_Tiled_Image.cxx",
+		"FLTK/src/Fl_Tree.cxx",
+		"FLTK/src/Fl_Tree_Item.cxx",
+		"FLTK/src/Fl_Tree_Item_Array.cxx",
+		"FLTK/src/Fl_Tree_Prefs.cxx",
+		"FLTK/src/Fl_Tooltip.cxx",
+		"FLTK/src/Fl_Valuator.cxx",
+		"FLTK/src/Fl_Value_Input.cxx",
+		"FLTK/src/Fl_Value_Output.cxx",
+		"FLTK/src/Fl_Value_Slider.cxx",
+		"FLTK/src/Fl_Widget.cxx",
+		"FLTK/src/Fl_Window.cxx",
+		"FLTK/src/Fl_Window_fullscreen.cxx",
+		"FLTK/src/Fl_Window_hotspot.cxx",
+		"FLTK/src/Fl_Window_iconize.cxx",
+		"FLTK/src/Fl_Wizard.cxx",
+		"FLTK/src/Fl_XBM_Image.cxx",
+		"FLTK/src/Fl_XPM_Image.cxx",
+		"FLTK/src/Fl_abort.cxx",
+		"FLTK/src/Fl_add_idle.cxx",
+		"FLTK/src/Fl_arg.cxx",
+		"FLTK/src/Fl_compose.cxx",
+		"FLTK/src/Fl_display.cxx",
+		"FLTK/src/Fl_get_key.cxx",
+		"FLTK/src/Fl_get_system_colors.cxx",
+		"FLTK/src/Fl_grab.cxx",
+		"FLTK/src/Fl_lock.cxx",
+		"FLTK/src/Fl_own_colormap.cxx",
+		"FLTK/src/Fl_visual.cxx",
+		"FLTK/src/Fl_x.cxx",
+		"FLTK/src/filename_absolute.cxx",
+		"FLTK/src/filename_expand.cxx",
+		"FLTK/src/filename_ext.cxx",
+		"FLTK/src/filename_isdir.cxx",
+		"FLTK/src/filename_list.cxx",
+		"FLTK/src/filename_match.cxx",
+		"FLTK/src/filename_setext.cxx",
+		"FLTK/src/fl_arc.cxx",
+		"FLTK/src/fl_arci.cxx",
+		"FLTK/src/fl_ask.cxx",
+		"FLTK/src/fl_boxtype.cxx",
+		"FLTK/src/fl_color.cxx",
+		"FLTK/src/fl_cursor.cxx",
+		"FLTK/src/fl_curve.cxx",
+		"FLTK/src/fl_diamond_box.cxx",
+		"FLTK/src/fl_dnd.cxx",
+		"FLTK/src/fl_draw.cxx",
+		"FLTK/src/fl_draw_image.cxx",
+		"FLTK/src/fl_draw_pixmap.cxx",
+		"FLTK/src/fl_encoding_latin1.cxx",
+		"FLTK/src/fl_encoding_mac_roman.cxx",
+		"FLTK/src/fl_engraved_label.cxx",
+		"FLTK/src/fl_file_dir.cxx",
+		"FLTK/src/fl_font.cxx",
+		"FLTK/src/fl_gleam.cxx",
+		"FLTK/src/fl_gtk.cxx",
+		"FLTK/src/fl_labeltype.cxx",
+		"FLTK/src/fl_line_style.cxx",
+		"FLTK/src/fl_open_uri.cxx",
+		"FLTK/src/fl_oval_box.cxx",
+		"FLTK/src/fl_overlay.cxx",
+		"FLTK/src/fl_overlay_visual.cxx",
+		"FLTK/src/fl_plastic.cxx",
+		"FLTK/src/fl_read_image.cxx",
+		"FLTK/src/fl_rect.cxx",
+		"FLTK/src/fl_round_box.cxx",
+		"FLTK/src/fl_rounded_box.cxx",
+		"FLTK/src/fl_set_font.cxx",
+		"FLTK/src/fl_set_fonts.cxx",
+		"FLTK/src/fl_scroll_area.cxx",
+		"FLTK/src/fl_shadow_box.cxx",
+		"FLTK/src/fl_shortcut.cxx",
+		"FLTK/src/fl_show_colormap.cxx",
+		"FLTK/src/fl_symbols.cxx",
+		"FLTK/src/fl_vertex.cxx",
+		"FLTK/src/screen_xywh.cxx",
+		"FLTK/src/fl_utf8.cxx",
+		"FLTK/src/ps_image.cxx"
+	];
+	SRC += [
+		"FLTK/src/fl_call_main.c",
+		"FLTK/src/flstring.c",
+		"FLTK/src/scandir.c",
+		"FLTK/src/numericsort.c",
+		"FLTK/src/vsnprintf.c",
+		"FLTK/src/fl_utf.c"
+	];
+	SRC += [
+		"FLTK/src/xutf8/case.c",
+		"FLTK/src/xutf8/is_right2left.c",
+		"FLTK/src/xutf8/is_spacing.c",
+		"FLTK/src/xutf8/keysym2Ucs.c",
+		"FLTK/src/xutf8/utf8Input.c",
+		"FLTK/src/xutf8/utf8Utils.c",
+		"FLTK/src/xutf8/utf8Wrap.c"
+	];
+	
+	// OS specific code
+	if OS() == "mac" then {
+		SRC += [
+	    	"FLTK/src/Fl_cocoa.mm",
+	    	"FLTK/src/Fl_Quartz_Printer.mm",
+	    	"FLTK/src/Fl_Native_File_Chooser_MAC.mm",
+	    	"FLTK/src/Fl_Sys_Menu_Bar.mm"
+		];
+	}
+	if OS() == "win" then {
+		SRC += [
+			"FLTK/src/Fl_get_key_win32.cxx",
+			"FLTK/src/Fl_win32.cxx",
+			"FLTK/src/fl_color_win32.cxx",
+			"FLTK/src/fl_dnd_win32.cxx",
+			"FLTK/src/fl_draw_image_win32.cxx",
+			"FLTK/src/fl_font_win32.cxx",
+			"FLTK/src/fl_read_image_win32.cxx",
+			"FLTK/src/fl_set_fonts_win32.cxx"
+		];
+	}
+	if OS() == "linux" then {
+		SRC += [
+			"FLTK/src/fl_dnd_x.cxx",
+			"FLTK/src/fl_font_x.cxx",
+			"FLTK/src/fl_set_fonts_x.cxx"
+		];
+	}
+	
+	// Define the sources
+	rule "lib";
+	requires [targets("configure")];
+	CXXFLAGS += " -DFL_LIBRARY -D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE -D_THREAD_SAFE -D_REENTRANT ";
+	input [SRC];
+	tag "libfltk";
+}
+
+target OUT+"/libfltk_gl.a" {
+	rule "lib";
+	tag "libfltk_gl";
+	requires [targets("libfltk")];
+	input [
+		"FLTK/src/Fl_Gl_Choice.cxx",
+		"FLTK/src/Fl_Gl_Overlay.cxx",
+		"FLTK/src/Fl_Gl_Device_Plugin.cxx",
+		"FLTK/src/Fl_Gl_Window.cxx",
+		"FLTK/src/freeglut_geometry.cxx",
+		"FLTK/src/freeglut_stroke_mono_roman.cxx",
+		"FLTK/src/freeglut_stroke_roman.cxx",
+		"FLTK/src/freeglut_teapot.cxx",
+		"FLTK/src/gl_draw.cxx",
+		"FLTK/src/gl_start.cxx",
+		"FLTK/src/glut_compatability.cxx",
+		"FLTK/src/glut_font.cxx"
+	];
+	CXXFLAGS += " -Wno-deprecated-declarations";
+	CXXFLAGS += " -DFL_LIBRARY";
+}
+
+target OUT+"/libfltk_forms.a" {
+	rule "lib";
+	tag "libfltk_forms";
+	requires [targets("libfltk")];
+	input [
+		"FLTK/src/forms_compatability.cxx",
+		"FLTK/src/forms_bitmap.cxx",
+		"FLTK/src/forms_free.cxx",
+		"FLTK/src/forms_fselect.cxx",
+		"FLTK/src/forms_pixmap.cxx",
+		"FLTK/src/forms_timer.cxx"
+	];
+	CXXFLAGS += " -DFL_LIBRARY";
+}
+
+target OUT+"/libfltk_image.a" {
+	rule "lib";
+	tag "libfltk_image";
+	requires [targets("libfltk")];
+	input [
+		"FLTK/src/fl_images_core.cxx",
+		"FLTK/src/Fl_BMP_Image.cxx",
+		"FLTK/src/Fl_File_Icon2.cxx",
+		"FLTK/src/Fl_GIF_Image.cxx",
+		"FLTK/src/Fl_Help_Dialog.cxx",
+		"FLTK/src/Fl_JPEG_Image.cxx",
+		"FLTK/src/Fl_PNG_Image.cxx",
+		"FLTK/src/Fl_PNM_Image.cxx"
+	];
+	CXXFLAGS += " -DFL_LIBRARY";
+}
+
+// FLTK's pseudo libs
+target OUT+"/libfltk_png.a" {
+	rule "lib";
+	tag "libfltk_png";
+	input [files("FLTK/png/*.c")];
+}

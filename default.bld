@@ -15,6 +15,9 @@ CHROMIUM_INCLUDE = " -Ilibchromiumcontent_"+OS()+"/src";
 if !exists(OUT) then { /*mkdir(OUT);*/ execute("mkdir "+OUT); }
 // if !exists(OBJ_DIR) then { /*mkdir(OUT);*/ execute("mkdir "+OBJ_DIR); }
 
+// Configuration utils! YEEEEEEEEY!!!
+include "./.IceTea/cDetect.bld";
+
 // NodeJS dependencies
 include "./.IceTea/libuv.bld";
 include "./.IceTea/libhttp-parser.bld";
@@ -29,10 +32,10 @@ include "./.IceTea/ttvfs.bld";
 include "./.IceTea/utils.bld";
 include "./.IceTea/libcanister.bld";
 include "./.IceTea/libucl.bld";
-include "./.IceTea/objectscript.bld";
+include "./.IceTea/fltk.bld";
 
 // Need PHP first...which depends on checks and generator.
-// include "./.IceTea/php.bld";
+//include "./.IceTea/php.bld";
 
 // Need proper path handling...
 // include "./libbu/default.bld";
@@ -41,7 +44,6 @@ include "./.IceTea/objectscript.bld";
 
 // About to come...
 /*
-	ph7.bld
 	fltk.bld
 	standart build files will be improved.
 	PHP extensions:
@@ -66,7 +68,7 @@ if OS() == "mac" then {
 		display "dylib";
 		tag "phoenix_engine";
 		profile "build" {
-			execute("${CXX} -dynamiclib -all_load out/*.a -o "+OUTPUT, "g++");
+			execute("${CXX} -dynamiclib -all_load ${LDFLAGS} out/*.a -o "+OUTPUT, "g++");
 		}
 		requires [
 			# nodejs
@@ -79,8 +81,13 @@ if OS() == "mac" then {
 			targets("libucl"),
 			targets("sqlite3"),
 			targets("libtrololo"),
-			targets("libos"),
-			targets("os-ext")
+			#FLTK
+			targets("configure"),
+			targets("libfltk"),
+			targets("libfltk_gl"),
+			targets("libfltk_forms"),
+			targets("libfltk_image"),
+			targets("libfltk_png")
 		];
 	}
 	target OUT+"/PhoenixEngine.framework" {
@@ -94,11 +101,14 @@ if OS() == "mac" then {
 			execute("cp '"+OUT+"/libPhoenixEngine.dylib' '"+OUTPUT+"/Phoenix Engine'");
 		}
 		profile "clean" {
-			print("Meep.");
+			condition always;
 			execute("rm -rf '"+OUTPUT+"'","rm");
 		}
 	}
 }
+
+// These includes are only possible, because they require the engine.
+include "./.IceTea/fltk_stuff.bld";
 
 action "all" { build: [targets()]; }
 action "default" { build: [targets("phoenix_engine")]; }
@@ -116,9 +126,6 @@ action "framework" {
 		build: [targets("PEFramework")];
 	}
 }
-
-action "libucl" { build: [targets("libucl")]; }
-action "libucl-clean" { clean: [targets("libucl")]; }
 
 action "rebuild" {
 	clean: [targets("phoenix_engine")];

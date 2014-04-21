@@ -1,36 +1,72 @@
 INC_DIRS += " -Iphp/main -Iphp/TSRM -Iphp/Zend";
 CXXFLAGS += INC_DIRS;
 CFLAGS += INC_DIRS;
-CXXFLAGS += " -IPHP-CPP -std=c++11";
+CXXFLAGS += " -Iphp-ext/PHP-CPP -std=c++11";
 
 // In order to fully support PHP-CPP...
 PHP_CONFIG = "php-config";
 PHP_BIN = "$(${PHP_CONFIG} --php-bin)";
 PHPCPP_LDFLAGS += "$(${PHP_CONFIG} --ldflags)";
 
+// embedding.
+CFLAGS += " -Iembed2-sapi/src/";
+CXXFLAGS += " -Iembed2-sapi/src/";
+
 // Needs configuring and generating.
 /*target OUT+"/libphp5.a" {...}*/
 
 target "PHP-CPP/config_util" {
-	input [files("PHP-CPP/config/*.cpp")];
+	input [files("php-ext/PHP-CPP/config/*.cpp")];
 	rule "exe";
 	tag "phpcpp_config";
 }
 
 target "PHP-CPP/config.h" {
-	requires ["PHP-CPP/config_util"];
+	requires [targets("phpcpp_config")];
 	tag "phpcpp_config_h";
 	display "Generating";
 	profile "build" {
 		execute(
-			"./PHP-CPP/config_util > "+OUTPUT, 
-			fileName("PHP-CPP/config_util")
+			"./php-ext/PHP-CPP/config_util > '"+OUTPUT+"'", 
+			fileName("php-ext/PHP-CPP/config_util")
 		);
 	}
 }
 
 target OUT+"/libphp-cpp.a" {
-	CXXFLAGS += " -fpic -IPHP-CPP/src/";
+	CXXFLAGS += " -fpic -Iphp-ext/PHP-CPP/src/";
 	requires ["phpcpp_config_h"];
 	input [files("PHP-CPP/src/*.cpp")];
+	tag "php-ext";
+}
+
+// Lets deal with the PHP extensions.
+// Yes, this all is gonna be hand-crafted, to be as individual as possible.
+target OUT+"/libphp-jsond.a" {
+	rule "lib";
+	input [files("php-ext/jsond/*.c")];
+	tag "php-ext";
+	CFLAGS += " -Iphp-ext/jsond";
+}
+target OUT+"/libphp-v8js.a" {
+	rule "lib";
+	input [files("php-ext/v8js/*.c"), files("php-ext/v8js/*.cc")];
+	tag "php-ext";
+	CXXFLAGS += CHROMIUM_INCLUDE+"/v8/include -Iphp-ext/v8js";
+	CFLAGS += CHROMIUM_INCLUDE+"/v8/include -Iphp-ext/v8js";
+}
+target OUT+"/libphp-pthreads.a" {
+	rule "lib";
+	tag "php-ext";
+	CFLAGS += " -Iphp-ext/pthreads/classes -Iphp-ext/pthreads/iterators -Iphp-ext/pthreads/src -Iphp-ext/pthreads";
+	input [files("php-ext/pthreads/src/*.c")];
+}
+target OUT+"/libphp-uv.a" {
+	rule "lib";
+	tag "php-ext";
+	input [files("php-ext/uv/*.c")];
+	CFLAGS += " -Iphp-ext/uv";
+}
+target OUT+"/libphp-embed2-sapi.a" {
+	input [files("embed2-sapi/src/*.c")];
 }
