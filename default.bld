@@ -7,9 +7,9 @@ if enable_debug != null then {
 // we define that for any case.
 OUT = "./out";
 // OBJ_DIR = "./obj";
-LDFLAGS += " -L"+OUT+" -Llibchromiumcontent_"+OS()+"/"+BUILD_TYPE;
-CFLAGS += " -fPIC -fno-common -Wno-pointer-sign";
-CXXFLAGS += " -fPIC -fno-common -Wno-pointer-sign -g";
+LDFLAGS += LDFLAGS.lib_dir(OUT).lib_dir("libchromiumcontent_"+OS()+"/"+BUILD_TYPE);
+CFLAGS += " -fPIC -fno-common -Wno-pointer-sign -g -Wno-deprecated-declarations";
+CXXFLAGS += " -fPIC -fno-common -Wno-pointer-sign -g -Wno-deprecated-declarations";
 CHROMIUM_INCLUDE = " -Ilibchromiumcontent_"+OS()+"/src";
 
 if !exists(OUT) then { /*mkdir(OUT);*/ execute("mkdir "+OUT); }
@@ -65,11 +65,10 @@ include "./.IceTea/fltk.bld";
 // Very super-duper special... :)
 if OS() == "mac" then {
 	target OUT+"/libPhoenixEngine.dylib" {
-		display "dylib";
 		tag "phoenix_engine";
-		profile "build" {
-			execute("${CXX} -dynamiclib -all_load ${LDFLAGS} out/*.a -o "+OUTPUT, "g++");
-		}
+		LDFLAGS += " -all_load";
+		rule "dylib";
+		input [ files(OUT+"/*.a") ];
 		requires [
 			# nodejs
 			targets("http-parser"),
