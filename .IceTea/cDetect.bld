@@ -12,7 +12,7 @@ rule "cDetect" {
 	}
 	profile "clean" {
 		condition fileExists;
-		execute("rm ${OUTPUT}");
-		execute("rm ${CDOUT}");
+		execute("rm ${OUTPUT} || exit 0");
+		execute("rm ${CDOUT} || exit 0");
 	}
 }

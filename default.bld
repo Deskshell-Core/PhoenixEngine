@@ -35,7 +35,8 @@ include "./.IceTea/libucl.bld";
 include "./.IceTea/fltk.bld";
 
 // Need PHP first...which depends on checks and generator.
-//include "./.IceTea/php.bld";
+include "./.IceTea/php.bld";
+//include "./.IceTea/curl.bld";
 
 // Need proper path handling...
 // include "./libbu/default.bld";
@@ -44,7 +45,6 @@ include "./.IceTea/fltk.bld";
 
 // About to come...
 /*
-	fltk.bld
 	standart build files will be improved.
 	PHP extensions:
 		php-uv
@@ -68,7 +68,7 @@ if OS() == "mac" then {
 		tag "phoenix_engine";
 		LDFLAGS += " -all_load";
 		rule "dylib";
-		input [ files(OUT+"/*.a") ];
+		input [ OUT+"/*.a" ];
 		requires [
 			# nodejs
 			targets("http-parser"),
@@ -109,7 +109,7 @@ if OS() == "mac" then {
 // These includes are only possible, because they require the engine.
 include "./.IceTea/fltk_stuff.bld";
 
-action "all" { build: [targets()]; }
+action "all" { build: [targets("configure"), targets()]; }
 action "default" { build: [targets("phoenix_engine")]; }
 action "test" { build: [targets("test")]; }
 action "tools" { build: [targets("ph7"),targets("re2c")]; }

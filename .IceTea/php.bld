@@ -3,19 +3,51 @@ CXXFLAGS += INC_DIRS;
 CFLAGS += INC_DIRS;
 CXXFLAGS += " -Iphp-ext/PHP-CPP -std=c++11";
 
-// In order to fully support PHP-CPP...
-PHP_CONFIG = "php-config";
-PHP_BIN = "$(${PHP_CONFIG} --php-bin)";
-PHPCPP_LDFLAGS += "$(${PHP_CONFIG} --ldflags)";
-
 // embedding.
 CFLAGS += " -Iembed2-sapi/src/";
 CXXFLAGS += " -Iembed2-sapi/src/";
+if OS() == "mac" then {
+	// Seriously, PHP...why? xD ( Zend.m4:239 )
+	CFLAGS += " -DDARWIN";
+	CXXFLAGS += " -DDARWIN";
+}
+// We need proper php/TSRM/threads.m4 integration. This is flag-wise...complicated.
+// Best bet would be to extend the OS() function, combine with matches(), and add test-compile funcs.
+if OS() == "linux" then {
+	CFLAGS += " -D_REENTRANT";
+	CXXFLAGS += " -D_REENTRANT";
+}
+
+// We need to somehiw pull the inclusion of inttypes.h and the like inside! otherwise, this library is DEAD.
+/*LDFLAGS += " -pthread";
+target "php/TSRM/tsrm_config.h" {
+	rule "cDetect";
+	tag "configure";
+	input ["util/tsrm_configure.c"];
+	// Settings for the rule.
+	CDOUT = OUT+"/tsrm_configure";
+	CDFLAGS = "--cache=cache.txt --with-tsrm-zts";
+}
+target OUT+"/libtsrm.a" {
+	SRC = [
+		"php/TSRM/TSRM.c",
+		"php/TSRM/tsrm_nw.c",
+		"php/TSRM/tsrm_strtok_r.c",
+		"php/TSRM/tsrm_virtual_cwd.c"
+	];
+	if OS() == "win" then {
+		SRC += ["php/TSRM/tsrm_win32.c"];
+	}
+	requires [targets("configure")];
+	rule "lib";
+	tag "tsrm";
+	input [SRC];
+}*/
 
 // Needs configuring and generating.
 /*target OUT+"/libphp5.a" {...}*/
 
-target "PHP-CPP/config_util" {
+/*target "PHP-CPP/config_util" {
 	input [files("php-ext/PHP-CPP/config/*.cpp")];
 	rule "exe";
 	tag "phpcpp_config";
@@ -69,4 +101,4 @@ target OUT+"/libphp-uv.a" {
 }
 target OUT+"/libphp-embed2-sapi.a" {
 	input [files("embed2-sapi/src/*.c")];
-}
+}*/

@@ -4,3 +4,4 @@
 out/*
 libchromiumcontent_mac/*
 .build_cache
+cache.txt
