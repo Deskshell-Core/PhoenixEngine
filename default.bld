@@ -26,16 +26,17 @@ include "./.IceTea/libc-ares.bld";
 // PHP dependencies
 include "./.IceTea/sqlite3+Trololo.bld";
 include "./.IceTea/re2c.bld";
+include "./.IceTea/php.bld"; # Not completed yet!
 
 // Engine specific stuff
-include "./.IceTea/ttvfs.bld";
-include "./.IceTea/utils.bld";
-include "./.IceTea/libcanister.bld";
-include "./.IceTea/libucl.bld";
-include "./.IceTea/fltk.bld";
+include "./.IceTea/ttvfs.bld"; // FS abstraction + reading off ram capability
+include "./.IceTea/utils.bld"; // Random stuff
+include "./.IceTea/libcanister.bld"; // Minimal archiving library in FS block architecture. Very fast.
+include "./.IceTea/libucl.bld"; // JSON/YAML hybrid config parser
+include "./.IceTea/fltk.bld"; // GUI toolkit to abstract underlying OS' GUI engine (GTK, X11, Cocoa, Win32)
+include "./.IceTea/angelscript.bld"; // Default script interface for default setup.
 
 // Need PHP first...which depends on checks and generator.
-include "./.IceTea/php.bld";
 //include "./.IceTea/curl.bld";
 
 // Need proper path handling...
@@ -112,7 +113,7 @@ include "./.IceTea/fltk_stuff.bld";
 action "all" { build: [targets("configure"), targets()]; }
 action "default" { build: [targets("phoenix_engine")]; }
 action "test" { build: [targets("test")]; }
-action "tools" { build: [targets("ph7"),targets("re2c")]; }
+action "tools" { build: [targets("re2c")]; }
 
 // OS X stuff
 action "clean-framework" {
@@ -130,3 +131,8 @@ action "rebuild" {
 	clean: [targets("phoenix_engine")];
 	build: [targets("phoenix_engine")];
 }
+
+// for-loop does not work with actions, as actions arent expecting an expression, but rather a string literal.
+// Need to update build.y ...
+action "fltk" {	build: [ targets().matches("*fltk*") ]; }
+action "clean-fltk" { clean: [ targets().matches("*fltk*") ]; }

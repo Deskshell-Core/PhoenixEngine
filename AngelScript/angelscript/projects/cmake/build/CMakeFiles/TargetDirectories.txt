@@ -1,0 +1,2 @@
+/Users/Ingwie/Work/AngelScript/angelscript/projects/cmake/build/CMakeFiles/Angelscript.dir
+/Users/Ingwie/Work/AngelScript/angelscript/projects/cmake/build/game/CMakeFiles/game.dir

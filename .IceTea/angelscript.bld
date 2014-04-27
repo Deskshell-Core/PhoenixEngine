@@ -1,0 +1,32 @@
+# We only give the basic stuff in here - thus, this is C++ only.
+CXXFLAGS += " -IAngelScript/angelscript/include -Iadd_ons";
+
+// The main library.
+target OUT+"/libAngelScript.a" {
+	// Its funny, how its only the ASM stuff thats really making things difficult.
+	// Therefore, all CPP fiels can savely go in, whilst the .S/.asm has to be decided dynamicaly.
+	SRC = [files("AngelScript/angelscript/source/*.cpp")];
+	if OS() == "win" then {
+		// Need proper handling here. I am NOT certain if i can bluntly include both .asm's or not...
+		SRC += [files("AngelScript/angelscript/source/*.asm")];
+	} else {
+		// Check. This one works itself using #ifdefs.
+		SRC += [files("AngelScript/angelscript/source/*.S")];
+	}
+	CXXFLAGS += " -IAngelScript/angelscript/source -D_CRT_SECURE_NO_WARNINGS -DANGELSCRIPT_EXPORT -D_LIB";
+	rule "lib";
+	tag "libangelscript";
+	input [SRC];
+}
+
+// We add some extras, so we can interface with more standards.
+// For one, angelscript has no default string type.
+// For second, Angelscript can be confusing (to me not), so we add the helper stuff.
+for as_ext in ["scriptstdstring", "scriptbuilder"] do {
+	target OUT+"/libangelscript_"+as_ext+".a" {
+		tag "libangelscript";
+		rule "lib";
+		input [files("AngelScript/add_on/"+as_ext+"/*.cpp")];
+		CXXFLAGS += " -IAngelScript/add_on/"+as_ext;
+	}
+}

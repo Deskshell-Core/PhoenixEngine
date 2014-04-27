@@ -5,7 +5,7 @@ for fl_ex in [files("FLTK/examples/*.cxx")] do {
 		rule "exe";
 		input [fl_ex];
 		LDFLAGS += " -lfltk -lfltk_image -lfltk_gl -lfltk_forms"; // Link staticaly, as this will work without the engine then.
-		requires [targets("libfltk"), targets("libfltk_gl"), targets("libfltk_forms"), targets("libfltk_image")];
+		requires [targets("libfltk"), targets("libfltk_image")];
 	}
 	target OUT+"/fltk_example_shared_"+fl_ex.fileName().replace(".cxx","") {
 		tag "demo";
