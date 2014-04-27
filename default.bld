@@ -12,6 +12,9 @@ CFLAGS += " -fPIC -fno-common -Wno-pointer-sign -g -Wno-deprecated-declarations"
 CXXFLAGS += " -fPIC -fno-common -Wno-pointer-sign -g -Wno-deprecated-declarations";
 CHROMIUM_INCLUDE = " -Ilibchromiumcontent_"+OS()+"/src";
 
+// FLTK fix
+CXXFLAGS += " -Wno-c++11-narrowing";
+
 if !exists(OUT) then { /*mkdir(OUT);*/ execute("mkdir "+OUT); }
 // if !exists(OBJ_DIR) then { /*mkdir(OUT);*/ execute("mkdir "+OBJ_DIR); }
 
@@ -66,10 +69,6 @@ include "./.IceTea/angelscript.bld"; // Default script interface for default set
 // Very super-duper special... :)
 if OS() == "mac" then {
 	target OUT+"/libPhoenixEngine.dylib" {
-		tag "phoenix_engine";
-		LDFLAGS += " -all_load";
-		rule "dylib";
-		input [ OUT+"/*.a" ];
 		requires [
 			# nodejs
 			targets("http-parser"),
@@ -87,8 +86,13 @@ if OS() == "mac" then {
 			targets("libfltk_gl"),
 			targets("libfltk_forms"),
 			targets("libfltk_image"),
-			targets("libfltk_png")
+			targets("libfltk_png"),
+			targets("libangelscript")
 		];
+		tag "phoenix_engine";
+		LDFLAGS += " -all_load";
+		rule "dylib";
+		input [files(OUT+"/*.a")];
 	}
 	target OUT+"/PhoenixEngine.framework" {
 		display "Framework";

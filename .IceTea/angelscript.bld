@@ -22,7 +22,7 @@ target OUT+"/libAngelScript.a" {
 // We add some extras, so we can interface with more standards.
 // For one, angelscript has no default string type.
 // For second, Angelscript can be confusing (to me not), so we add the helper stuff.
-for as_ext in ["scriptstdstring", "scriptbuilder"] do {
+for as_ext in ["scriptstdstring", "scriptbuilder", "scriptarray"] do {
 	target OUT+"/libangelscript_"+as_ext+".a" {
 		tag "libangelscript";
 		rule "lib";
