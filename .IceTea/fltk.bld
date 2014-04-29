@@ -4,7 +4,7 @@ CXXFLAGS += " -IFLTK -IFLTK/png";
 // We also now add these.
 LDFLAGS += " -framework OpenGL -framework AGL -framework CoreAudio -framework ApplicationServices -framework Cocoa -ljpeg -lz";
 
-target [OUT+"/fltk.cflags","FLTK/config.h"] {
+target "FLTK/config.h" {
 	// Woo, double target.
 	rule "cDetect";
 	tag "configure";
@@ -13,6 +13,7 @@ target [OUT+"/fltk.cflags","FLTK/config.h"] {
 	// Settings for the rule.
 	CDOUT = OUT+"/fltk_configure";
 	CDFLAGS = "--cache=cache.txt --out=FLTK/config.h";
+	CD_OTHER = [OUT+"/fltk.cflags"];
 }
 
 // Now that we have a nice config.h file, lets make that mighty library a real thing.
@@ -267,7 +268,10 @@ target OUT+"/libfltk_image.a" {
 		"FLTK/src/Fl_PNM_Image.cxx"
 	];
 	CXXFLAGS += " -DFL_LIBRARY";
+	// Strip -DDEBUG
+	CXXFLAGS = CXXFLAGS.replace("-DDEBUG","");
 }
+
 
 // FLTK's pseudo libs
 target OUT+"/libfltk_png.a" {

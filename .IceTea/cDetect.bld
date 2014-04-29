@@ -14,5 +14,9 @@ rule "cDetect" {
 		condition fileExists;
 		execute("rm ${OUTPUT} || exit 0");
 		execute("rm ${CDOUT} || exit 0");
+		if CD_OTHER != null then { 
+			// We have to clean the other stuff too, if there is any.
+			execute("rm ${CD_OTHER} || exit 0");
+		}
 	}
 }
