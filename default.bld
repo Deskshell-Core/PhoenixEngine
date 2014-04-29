@@ -1,16 +1,25 @@
 if enable_debug != null then {
 	print("-- Debug enabled.");
 	BUILD_TYPE="Debug";
+	ALLFLAGS += "-DDEBUG";
 } else {
 	BUILD_TYPE="Release";
+	ALLFLAGS += "-O3 -DNDEBUG";
+}
+if enable_g != null then {
+	print("-- Debugger output enabled.");
+	ALLFLAGS += "-g";
 }
 // we define that for any case.
 OUT = "./out";
 // OBJ_DIR = "./obj";
 LDFLAGS += LDFLAGS.lib_dir(OUT).lib_dir("libchromiumcontent_"+OS()+"/"+BUILD_TYPE);
-CFLAGS += " -fPIC -fno-common -Wno-pointer-sign -g -Wno-deprecated-declarations";
-CXXFLAGS += " -fPIC -fno-common -Wno-pointer-sign -g -Wno-deprecated-declarations";
+ALLFLAGS += " -fPIC -fno-common -Wno-pointer-sign -Wno-deprecated-declarations";
 CHROMIUM_INCLUDE = " -Ilibchromiumcontent_"+OS()+"/src";
+
+// Append
+CXXFLAGS += ALLFLAGS;
+CFLAGS += ALLFLAGS;
 
 // FLTK fix
 CXXFLAGS += " -Wno-c++11-narrowing";
@@ -92,7 +101,7 @@ if OS() == "mac" then {
 		tag "phoenix_engine";
 		LDFLAGS += " -all_load";
 		rule "dylib";
-		input [files(OUT+"/*.a")];
+		input [ OUT+"/*.a" ];
 	}
 	target OUT+"/PhoenixEngine.framework" {
 		display "Framework";
@@ -140,3 +149,5 @@ action "rebuild" {
 // Need to update build.y ...
 action "fltk" {	build: [ targets().matches("*fltk*") ]; }
 action "clean-fltk" { clean: [ targets().matches("*fltk*") ]; }
+action "ttvfs" {	build: [ targets().matches("*ttvfs*") ]; }
+action "clean-ttvfs" { clean: [ targets().matches("*ttvfs*") ]; }
