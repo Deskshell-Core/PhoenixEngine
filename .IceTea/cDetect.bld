@@ -7,7 +7,7 @@ rule "cDetect" {
 		if CDFLAGS == null then { CDFLAGS = " "; }
 		
 		// Compile, then run.
-		execute("${CC} -IcDetect/cdetect/cdetect ${INPUT} -o ${CDOUT}");
+		execute("${CC} -IcDetect/cdetect ${INPUT} -o ${CDOUT}");
 		execute("${CDOUT} --quiet ${CDFLAGS}");
 	}
 	profile "clean" {
