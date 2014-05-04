@@ -1,0 +1,5 @@
+@ZEND_TOP@
+
+#include <_zend_config.h>
+
+@ZEND_BOTTOM@

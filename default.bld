@@ -25,7 +25,6 @@ CFLAGS += ALLFLAGS;
 CXXFLAGS += " -Wno-c++11-narrowing";
 
 if !exists(OUT) then { /*mkdir(OUT);*/ execute("mkdir "+OUT); }
-// if !exists(OBJ_DIR) then { /*mkdir(OUT);*/ execute("mkdir "+OBJ_DIR); }
 
 // Configuration utils! YEEEEEEEEY!!!
 include "./.IceTea/cDetect.bld";
@@ -38,7 +37,7 @@ include "./.IceTea/libc-ares.bld";
 // PHP dependencies
 include "./.IceTea/sqlite3+Trololo.bld";
 include "./.IceTea/re2c.bld";
-include "./.IceTea/php.bld"; # Not completed yet!
+include "./.IceTea/php.bld";
 
 // Engine specific stuff
 include "./.IceTea/ttvfs.bld"; // FS abstraction + reading off ram capability
@@ -101,7 +100,11 @@ if OS() == "mac" then {
 		tag "phoenix_engine";
 		LDFLAGS += " -all_load";
 		rule "dylib";
-		input [ OUT+"/*.a" ];
+
+		# This hack will pull all .a's from the target list, and pass it to the compiler command.
+		# Dirty, but useful. :)
+		# On windows, this should point to *.lib though....
+		input [targets().unique().matches("*.a")];
 	}
 	target OUT+"/PhoenixEngine.framework" {
 		display "Framework";
@@ -124,7 +127,7 @@ if OS() == "mac" then {
 include "./.IceTea/fltk_stuff.bld";
 
 action "all" { build: [targets("configure"), targets()]; }
-action "default" { build: [targets("phoenix_engine")]; }
+action "default" { build: [targets("configure"), targets("phoenix_engine")]; }
 action "test" { build: [targets("test")]; }
 action "tools" { build: [targets("re2c")]; }
 
@@ -151,3 +154,5 @@ action "fltk" {	build: [ targets().matches("*fltk*") ]; }
 action "clean-fltk" { clean: [ targets().matches("*fltk*") ]; }
 action "ttvfs" {	build: [ targets().matches("*ttvfs*") ]; }
 action "clean-ttvfs" { clean: [ targets().matches("*ttvfs*") ]; }
+action "php" {	build: [targets("configure"), targets("tsrm"), targets("zend")]; }
+action "clean-php" { clean: [targets("configure"), targets("tsrm"), targets("zend")];}

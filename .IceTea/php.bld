@@ -18,8 +18,6 @@ if OS() == "linux" then {
 	CXXFLAGS += " -D_REENTRANT";
 }
 
-// We need to somehiw pull the inclusion of inttypes.h and the like inside! otherwise, this library is DEAD.
-/*LDFLAGS += " -pthread";
 target "php/TSRM/tsrm_config.h" {
 	rule "cDetect";
 	tag "configure";
@@ -32,8 +30,8 @@ target OUT+"/libtsrm.a" {
 	SRC = [
 		"php/TSRM/TSRM.c",
 		"php/TSRM/tsrm_nw.c",
-		"php/TSRM/tsrm_strtok_r.c",
-		"php/TSRM/tsrm_virtual_cwd.c"
+		"php/TSRM/tsrm_strtok_r.c"
+		#"php/TSRM/tsrm_virtual_cwd.c"
 	];
 	if OS() == "win" then {
 		SRC += ["php/TSRM/tsrm_win32.c"];
@@ -42,7 +40,28 @@ target OUT+"/libtsrm.a" {
 	rule "lib";
 	tag "tsrm";
 	input [SRC];
-}*/
+}
+
+target "php/Zend/zend_config.h" {
+	rule "cDetect";
+	tag "configure";
+	input ["util/zend_configure.c"];
+	// Settings for the rule.
+	CDOUT = OUT+"/zend_configure";
+	CDFLAGS = "--cache=cache.txt";
+	CD_OTHER = "php/Zend/_zend_config.h";
+}
+
+target OUT+"/libzend.a" {
+	SRC = [files("php/Zend/*.c")];
+	requires [targets("configure")];
+	rule "lib";
+	tag "zend";
+	input [SRC];
+	// zend_static_allocator.c does not know what NULL is.
+	CFLAGS += "-DZTS -DNULL=0";
+}
+
 
 // Needs configuring and generating.
 /*target OUT+"/libphp5.a" {...}*/

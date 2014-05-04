@@ -268,8 +268,6 @@ target OUT+"/libfltk_image.a" {
 		"FLTK/src/Fl_PNM_Image.cxx"
 	];
 	CXXFLAGS += " -DFL_LIBRARY";
-	// Strip -DDEBUG
-	CXXFLAGS = CXXFLAGS.replace("-DDEBUG","");
 }
 
 

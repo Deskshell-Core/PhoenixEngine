@@ -7,6 +7,8 @@ void zend_dlsym_check();
 void zend_type_checks();
 void zend_config_process();
 void zend_double_check();
+void zend_mm_test();
+void zend_mmap_zero();
 
 /* This is: php/Zend/configure.in
 
@@ -19,16 +21,17 @@ void zend_double_check();
 		
 	Notes:
 		- Zend obviously has windows optimized files (.d/.dsp)!
+		- It has some head-breaking checks. All added now, cDetect however might wants to adopt the dlsym check.
 */
 int main(int argc, char** argv) {
 	config_begin();
 	ac_register();
-	
+
 	// We register some options here.
 	// cachefile is very neccessary for our caching...
    	config_option_register_group("cDetect extra");
 	config_option_register("cache",0,"cache.txt",0,"cDetect cache file to use.");
-	config_option_register("out",0,"php/Zend/zend_config.h",0,"Output config.h.");
+	config_option_register("out",0,"php/Zend/_zend_config.h",0,"Output config.h.");
 	
 	// Zend options
 	config_option_register_group("Zend Engine");
@@ -45,6 +48,9 @@ int main(int argc, char** argv) {
 	config_option_register("enable-debug",0,"no","yes","If building zend_execute.lo fails, try this switch");
 	
 	if(config_options(argc, argv)) {
+	// Build stuff
+	config_build_register("util/zend_config.h.in","php/Zend/zend_config.h");
+
 		// The main logic happens here, just as always.
 		zend_config_process();
 		
@@ -62,9 +68,6 @@ int main(int argc, char** argv) {
 			"#endif\n"
 			"\n"
 			"#define ZEND_DLIMPORT\n"
-			"\n"
-			"#undef uint\n"
-			"#undef ulong\n"
 			"\n"
 			"/* Define if you want to enable memory limit support */\n"
 			"#define MEMORY_LIMIT 0\n"
@@ -152,7 +155,6 @@ int main(int argc, char** argv) {
 			"#/*This detection against winsock is of no use*/ undef HAVE_SYS_SOCKET_H\n"
 			"#endif\n"
 			"#endif\n"
-			"\n"
 		);
 		
 		// Do some checks
@@ -186,6 +188,11 @@ int main(int argc, char** argv) {
 		#if __APPLE__ || __DARWIN__
 		config_macro_define("DARWIN","1");
 		#endif
+		
+		// Complex checks
+		zend_dlsym_check();
+		zend_mm_test();
+		zend_mmap_zero();
 	}
 	config_end();
 }
@@ -223,8 +230,7 @@ void zend_config_process() {
 	if(config_equal( config_option_get("enable-debug"), "yes" )) {
 		config_macro_define("ZEND_DEBUG","1");
 	} else {
-		// Hmmmmm....really?
-		//config_macro_define("ZEND_DEBUG","0");
+		config_macro_define("ZEND_DEBUG","0");
 	}
 	if(config_equal( config_option_get("enable-maintainer-zts"), "yes" )) {
 		config_macro_define("ZTS","1");
@@ -276,12 +282,22 @@ void zend_mature_stdc() {
 	config_header_check("signal.h");
 	config_header_check("unix.h");
 	config_header_check("dlfcn.h");
+	if(config_header_check("sys/types.h")==1) {
+		// For some uber weird reason, this does not get defined O_o
+		config_macro_define("HAVE_SYS_TYPES_H","1");
+	}
 }
 void zend_type_checks() {
-	config_type_check("uint")
-		|| config_type_check("unsigned int");
-	config_type_check("ulong")
-		|| config_type_check("unsigned long");
+	// sizeofs
+	config_macro_define_format("SIZEOF_INT","%d",(int)sizeof(int));
+	config_macro_define_format("SIZEOF_LONG","%d",(int)sizeof(long));
+	
+	if(config_type_check_header("uint","sys/types.h") == 0) {
+		config_macro_define("uint", "unsigned int");
+	}
+	if(config_type_check_header("ulong","sys/types.h") == 0) {
+		config_macro_define("ulong", "unsigned long");
+	}
 
 	config_type_check("uint16_t")
 		|| config_type_check_header("uint16_t","stddef.h") 
@@ -335,50 +351,41 @@ void zend_double_check() {
     config_report_bool("double cast to long preserves least significant bits",rt);
 }
 
-/*AC_DEFUN([LIBZEND_DLSYM_CHECK],[
-dnl
-dnl Ugly hack to check if dlsym() requires a leading underscore in symbol name.
-dnl
-AC_MSG_CHECKING([whether dlsym() requires a leading underscore in symbol names])
-_LT_AC_TRY_DLOPEN_SELF([
-  AC_MSG_RESULT(no)
-], [
-  AC_MSG_RESULT(yes)
-  AC_DEFINE(DLSYM_NEEDS_UNDERSCORE, 1, [Define if dlsym() requires a leading underscore in symbol names. ])
-], [
-  AC_MSG_RESULT(no)
-], [])
-])
-*/
 void zend_dlsym_check() {
-	// Do this so we can actually use this!
-	cdetect_save_files();
+	// We have to define the shared library extension first.
+	#ifdef __APPLE__
+	config_tool_define("SHLIB_EXT","dylib");
+	#elif defined(__POSIX__) || defined(__LINUX__)
+	config_tool_define("SHLIB_EXT","so");
+	#else
+	config_tool_define("SHLIB_EXT","dll");
+	#endif
+	
 	// Note, we use a format here to define the header.
 	char* source1 = "void derpderp() { }";
 	char* source2 = 
-		"#include \"@CONFIG_H@\"                                \n"
-		"#ifdef HAVE_DLFCN                                      \n"
 		"#include <dlfcn.h>                                     \n"
-		"#endif                                                 \n"
+		"#include <stdlib.h>                                    \n"
+		"#include <stdio.h>                                     \n"
 		"                                                       \n"
 		"int main() {                                           \n"
-		"    void* hande;                                       \n"
+		"    void* handle;                                       \n"
 		"    void* symbol;                                      \n"
 		"#ifndef RTLD_LAZY                                      \n"
         "    int mode = 1;                                      \n"
         "#else                                                  \n"
        "    int mode = RTLD_LAZY;                               \n"
        "#endif                                                  \n"
-       "    handle = dlopen(\"./dyna.@SHLIB_EXT@\", mode);      \n"
+       "    handle = dlopen(\"./derp.@SHLIB_EXT@\", mode);      \n"
        "    if (handle == NULL) {                               \n"
 	   "        printf (\"1\");                                 \n"
 	   "        fflush(stdout);                                 \n"
 	   "        exit(0);                                        \n"
        "    }                                                   \n"
-       "    symbol = dlsym(handle, \"fred\");                   \n"
+       "    symbol = dlsym(handle, \"derpderp\");               \n"
        "    if (symbol == NULL) {                               \n"
 	   "        /* try putting a leading underscore */          \n"
-	   "        symbol = dlsym(handle, \"_fred\");              \n"
+	   "        symbol = dlsym(handle, \"_derpderp\");          \n"
 	   "        if (symbol == NULL) {                           \n"
 	   "            printf(\"2\");                              \n"
 	   "            fflush(stdout);                             \n"
@@ -390,15 +397,113 @@ void zend_dlsym_check() {
        "    fflush(stdout);                                     \n"
        "    exit(0);                                            \n"
        "}                                                       \n";
-	// stuckness is suckness.
+    
+    /* Steps to do:
+    	1. Compile derpderp and test code (derp.dylib and test)
+    	2. Run test and see what number it returns:
+    		1: Couldnt open at all. Abort.
+    		2: Using an underscore did not work.
+    		3: Using AN underscore WORKED.
+    		4: Using NO underscore WORKED.
+    */
+    
+    // Reporter
+    cdetect_bool_t success;
+    
+    // Message
+    char* msg = "wether we need an underscore for dlsym() or not";
+    
+    // source strings, file strings
+    cdetect_string_t cd_source1 = cdetect_string_format("%s",source1);
+    cdetect_string_t cd_source2_in = cdetect_string_format("%s",source2);
+    cdetect_string_t cd_source2 = cdetect_string_format("");
+    cdetect_string_t lib_file_in = cdetect_string_format("derp.@SHLIB_EXT@");
+    cdetect_string_t lib_file = cdetect_string_format("");
+    cdetect_string_t src_file1 = cdetect_string_format("derp.c");
+    cdetect_string_t src_file2 = cdetect_string_format("derp_test.c");
+    cdetect_string_t exe_file = cdetect_string_format("./derp_test");
+    
+    // Compiler stuff
+    cdetect_string_t compile_flags = cdetect_string_format("");
+    cdetect_string_t link_flags = cdetect_string_format("-shared");
+    cdetect_string_t link_flags2 = cdetect_string_format("");
+    
+    // Result olders
+    cdetect_string_t result1 = cdetect_string_format("");
+    cdetect_string_t result2 = cdetect_string_format("");
+
+	// Lets compensate the shlib first.
+	cdetect_substitute_string(lib_file_in, &lib_file);
+	cdetect_substitute_string(cd_source2_in, &cd_source2);
+    
+    // Write the source files
+    cdetect_log("cdetect_file_overrite( fileName=%s, cd_source1=%s )\n", src_file1->content, cd_source1->content);
+    success = cdetect_file_overwrite(src_file1->content, cd_source1);
+    if (success == CDETECT_FALSE) {
+        cdetect_log("Cannot write file %'^s\n",  cd_source1);
+    } else {
+    	cdetect_log("cdetect_file_overrite( fileName=%s, cd_source1=... )\n", src_file2->content);
+    	cdetect_log(">>> BEGIN DATA\n%s\n>>> END DATA", cd_source2->content);
+    	success = cdetect_file_overwrite(src_file2->content, cd_source2);
+    	if (success == CDETECT_FALSE) {
+        	cdetect_log("Cannot write file %'^s\n",  cd_source2);
+        } else {	
+			// Let's see if we can compile the library.    
+			success = cdetect_compile_file(src_file1, lib_file, compile_flags, link_flags, 0, CDETECT_FALSE, CDETECT_FALSE, &result1);
+			if(success == CDETECT_FALSE) {
+				config_report("!! Error: Can not compile test. Run with --verbose to see more.\n");
+				config_abort();
+			}
+			
+			success = cdetect_compile_file(src_file2, exe_file, compile_flags, link_flags2, 0, CDETECT_TRUE, CDETECT_FALSE, &result2);
+			if(success == CDETECT_FALSE) {
+				config_report("!! Error: Can not compile test. Run with --verbose to see more.\n");
+				config_abort();
+			}
+			
+			// Convert the resulting string number into an integer
+			int rt = ((int)result2->content[0])-48;
+			cdetect_log("dlsym() test printed %s\n",result2->content);
+			cdetect_log("dlsym() test returned %d\n",rt);
+			// Now we can switch it.
+			switch(rt) {
+				case 1:
+				case 2:
+					config_report("!! Error: Something is going very wrong with dlsym(), run with --verbose for more info.");
+					config_abort();
+					break;
+				case 3:
+					config_report_string(msg,"with underscore");
+					config_macro_define("DLSYM_NEEDS_UNDERSCORE","1");
+					break;
+				case 4:
+					config_report_string(msg,"without underscore");
+					break;
+			}
+			
+			// File removal
+			cdetect_file_remove(src_file1->content);
+			cdetect_file_remove(src_file2->content);
+			cdetect_file_remove(lib_file->content);
+			cdetect_file_remove(exe_file->content);
+
+			// Proper destruction
+			cdetect_string_destroy(cd_source1);
+			cdetect_string_destroy(cd_source2);
+			cdetect_string_destroy(lib_file_in);
+			cdetect_string_destroy(lib_file);
+			cdetect_string_destroy(exe_file);
+			cdetect_string_destroy(src_file1);
+			cdetect_string_destroy(src_file2);
+			cdetect_string_destroy(compile_flags);
+			cdetect_string_destroy(link_flags);
+			cdetect_string_destroy(link_flags2);
+			cdetect_string_destroy(result1);
+			cdetect_string_destroy(result2);
+        }
+    }
+    
 }
-
-/*dnl test and set the alignment define for ZEND_MM
-dnl this also does the logarithmic test for ZEND_MM.
-AC_MSG_CHECKING(for MM alignment and log values)
-
-AC_TRY_RUN([
-#include <stdio.h>
 
 typedef union _mm_align_test {
   void *ptr;
@@ -411,84 +516,71 @@ typedef union _mm_align_test {
 #else
 #define ZEND_MM_ALIGNMENT (sizeof(mm_align_test))
 #endif
+void zend_mm_test() {
+	// This is copypasted and modified from Zend/configure.in
+	int i = ZEND_MM_ALIGNMENT;
+	int zeros = 0;
 
-int main()
-{
-  int i = ZEND_MM_ALIGNMENT;
-  int zeros = 0;
-  FILE *fp;
-
-  while (i & ~0x1) {
-    zeros++;
-    i = i >> 1;
-  }
-
-  fp = fopen("conftest.zend", "w");
-  fprintf(fp, "%d %d\n", ZEND_MM_ALIGNMENT, zeros);  
-  fclose(fp);
-
-  exit(0);
+	while (i & ~0x1) {
+    	zeros++;
+    	i = i >> 1;
+	}
+	
+	//fprintf(fp, "%d %d\n", ZEND_MM_ALIGNMENT, zeros);  
+	
+	// time to use this info.
+    cdetect_output("checking for Zend MM alignment logarithm... %d and %d\n",ZEND_MM_ALIGNMENT,zeros);
+	config_macro_define_format("ZEND_MM_ALIGNMENT","%d",ZEND_MM_ALIGNMENT);
+	config_macro_define_format("ZEND_MM_ALIGNMENT_LOG2","%d",zeros);
 }
-], [
-  LIBZEND_MM_ALIGN=`cat conftest.zend | cut -d ' ' -f 1`
-  LIBZEND_MM_ALIGN_LOG2=`cat conftest.zend | cut -d ' ' -f 2`
-  AC_DEFINE_UNQUOTED(ZEND_MM_ALIGNMENT, $LIBZEND_MM_ALIGN, [ ])
-  AC_DEFINE_UNQUOTED(ZEND_MM_ALIGNMENT_LOG2, $LIBZEND_MM_ALIGN_LOG2, [ ]) 
-], [], [
-  dnl cross-compile needs something here
-  LIBZEND_MM_ALIGN=8
-])*/
-/*dnl test for memory allocation using mmap("/dev/zero")
-AC_MSG_CHECKING(for memory allocation using mmap("/dev/zero"))
 
-AC_TRY_RUN([
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <fcntl.h>
-#include <sys/mman.h>
-#include <stdlib.h>
-#include <stdio.h>
-#ifndef MAP_ANON
-# ifdef MAP_ANONYMOUS
-#  define MAP_ANON MAP_ANONYMOUS
-# endif
-#endif
-#ifndef MREMAP_MAYMOVE
-# define MREMAP_MAYMOVE 0
-#endif
-#ifndef MAP_FAILED
-# define MAP_FAILED ((void*)-1)
-#endif
-
-#define SEG_SIZE (256*1024)
-
-int main()
-{
-	int fd;
-	void *seg;
-
-	fd = open("/dev/zero", O_RDWR, S_IRUSR | S_IWUSR);
-	if (fd < 0) {
-		return 1;
+void zend_mmap_zero() {
+	char* src =
+		"#include <sys/types.h>\n"
+		"#include <sys/stat.h>\n"
+		"#include <fcntl.h>\n"
+		"#include <sys/mman.h>\n"
+		"#include <stdlib.h>\n"
+		"#include <stdio.h>\n"
+		"#ifndef MAP_ANON\n"
+		"# ifdef MAP_ANONYMOUS\n"
+		"#  define MAP_ANON MAP_ANONYMOUS\n"
+		"# endif\n"
+		"#endif\n"
+		"#ifndef MREMAP_MAYMOVE\n"
+		"# define MREMAP_MAYMOVE 0\n"
+		"#endif\n"
+		"#ifndef MAP_FAILED\n"
+		"# define MAP_FAILED ((void*)-1)\n"
+		"#endif\n"
+		"\n"
+		"#define SEG_SIZE (256*1024)\n"
+		"\n"
+		"int main()\n"
+		"{\n"
+		"	int fd;\n"
+		"	void *seg;\n"
+		"\n"
+		"	fd = open(\"/dev/zero\", O_RDWR, S_IRUSR | S_IWUSR);\n"
+		"	if (fd < 0) {\n"
+		"		return 1;\n"
+		"	}\n"
+		"	seg = mmap(NULL, SEG_SIZE, PROT_READ | PROT_WRITE, MAP_PRIVATE, fd, 0);\n"
+		"	if (seg == MAP_FAILED) {\n"
+		"		return 2;\n"
+		"	}\n"
+		"	if (munmap(seg, SEG_SIZE) != 0) {\n"
+		"		return 3;\n"
+		"	}\n"
+		"	if (close(fd) != 0) {\n"
+		"		return 4;\n"
+		"	}\n"
+		"	return 0;\n"
+		"}\n";
+	
+	int rt = config_execute_source(src, "", "");
+	config_report_bool("for memory allocation using mmap(\"/dev/zero\")",rt);
+	if(rt != 0) {
+		config_macro_define("HAVE_MEM_MMAP_ZERO","1");
 	}
-	seg = mmap(NULL, SEG_SIZE, PROT_READ | PROT_WRITE, MAP_PRIVATE, fd, 0);
-	if (seg == MAP_FAILED) {
-		return 2;
-	}
-	if (munmap(seg, SEG_SIZE) != 0) {
-		return 3;
-	}
-	if (close(fd) != 0) {
-		return 4;
-	}
-	return 0;
 }
-], [
-  AC_DEFINE([HAVE_MEM_MMAP_ZERO], 1, [Define if the target system has support for memory allocation using mmap("/dev/zero")])
-  AC_MSG_RESULT(yes)
-], [
-  AC_MSG_RESULT(no)
-], [
-  dnl cross-compile needs something here
-  AC_MSG_RESULT(no)
-])*/

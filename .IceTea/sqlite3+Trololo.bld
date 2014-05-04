@@ -11,6 +11,7 @@ target OUT+"/sqlite3_shell" {
 	requires [targets("sqlite3")];
 	input ["sqlite3/shell.c"];
 	LDFLAGS += " -lsqlite3";
+	tag "test";
 }
 
 // Add the Trololo stuff!! :D
@@ -19,7 +20,7 @@ CXXFLAGS += " -ITrololo";
 target OUT+"/libtrololo.a" {
 	input ["Trololo/SqliteDatabase.cc", "Trololo/QueryResult.cc"];
 	rule "lib";
-	tag "sqlite3";
+	tag "libtrololo";
 }
 
 target OUT+"/Trololo_test" {
@@ -28,5 +29,5 @@ target OUT+"/Trololo_test" {
 	rule "exe";
 	requires [targets("sqlite3")];
 	LDFLAGS += " -lsqlite3 -ltrololo";
-	tag "libtrololo";
+	tag "test";
 }

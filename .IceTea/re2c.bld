@@ -3,8 +3,11 @@ target OUT+"/re2c" {
 	// Original command:
 	// g++ *.cc bootstrap/*.cc -Ibootstrap -I. -o re2c -std=c++11 -DPACKAGE_VERSION="\"`date +'%d %b %Y'`\"" -DHAVE_STRDUP
 	rule "exe";
-	input [files("re2c/re2c/*.cc"), files("re2c/re2c/bootstrap/*.cc")];
+	input [files("re2c/re2c/*.cc")];
 	tag "re2c";
 	CXXFLAGS += " -Ire2c/re2c -Ire2c/re2c/bootstrap";
 	CXXFLAGS += " -DHAVE_STRDUP -DPACKAGE_VERSION='\"0.13.7.dev\"'";
 }
+
+// So, make it work also
+RE2C="re2c";
