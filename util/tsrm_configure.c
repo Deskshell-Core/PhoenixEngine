@@ -9,7 +9,7 @@ int main(int argc, char** argv){
 	
    	config_option_register_group("cDetect extra");
 	config_option_register("cache",0,"cache.txt",0,"cDetect cache file to use.");
-	config_option_register("out",0,"php/TSRM/tsrm_config.h",0,"Output config.h.");
+	config_option_register("out",0,"php/TSRM/_tsrm_config.h",0,"Output config.h.");
 	
 	// TSRM options
 	config_option_register_group("TSRM: ThreadSafe Resource Management");
@@ -57,6 +57,21 @@ int main(int argc, char** argv){
 		config_function_check_library("pthread_create","pthread")
 			|| config_macro_define("PTHREADS","1");
 		
+		// Write a bit of extra chunk...
+		char* tsrm_config_h = "php/TSRM/tsrm_config.h";
+		config_report("Writing %s\n", tsrm_config_h);
+		cdetect_string_t src = cdetect_string_format(
+			"#include \"_tsrm_config.h\"\n"
+			"#ifdef HAVE_STDLIB_H\n"
+			"#include <stdlib.h>\n"
+			"#endif\n"
+		);
+		cdetect_bool_t sc = cdetect_file_overwrite(tsrm_config_h, src);
+		if(sc != CDETECT_TRUE) {
+			config_report("!! Error: Could not write php/TSRM/tsrm_config.h!\n");
+			config_abort();
+		}
+		cdetect_string_destroy(src);
 	}
 	config_end();
 }

@@ -25,6 +25,7 @@ target "php/TSRM/tsrm_config.h" {
 	// Settings for the rule.
 	CDOUT = OUT+"/tsrm_configure";
 	CDFLAGS = "--cache=cache.txt --with-tsrm-zts";
+	CD_OTHER = "php/Zend/_tsrm_config.h";
 }
 target OUT+"/libtsrm.a" {
 	SRC = [
@@ -53,7 +54,53 @@ target "php/Zend/zend_config.h" {
 }
 
 target OUT+"/libzend.a" {
-	SRC = [files("php/Zend/*.c")];
+	SRC = [
+		"php/Zend/zend_language_parser.c",
+		"php/Zend/zend_language_scanner.c",
+		"php/Zend/zend_ini_parser.c",
+		"php/Zend/zend_ini_scanner.c",
+		"php/Zend/zend_alloc.c",
+		"php/Zend/zend_compile.c",
+		"php/Zend/zend_constants.c",
+		"php/Zend/zend_dynamic_array.c",
+		"php/Zend/zend_execute.c",
+		"php/Zend/zend_execute_API.c",
+		"php/Zend/zend_highlight.c",
+		"php/Zend/zend_llist.c",
+		"php/Zend/zend_vm_opcodes.c",
+		"php/Zend/zend_opcode.c",
+		"php/Zend/zend_operators.c",
+		"php/Zend/zend_ptr_stack.c",
+		"php/Zend/zend_stack.c",
+		"php/Zend/zend_variables.c",
+		"php/Zend/zend.c",
+		"php/Zend/zend_API.c",
+		"php/Zend/zend_extensions.c",
+		"php/Zend/zend_hash.c",
+		"php/Zend/zend_list.c",
+		"php/Zend/zend_indent.c",
+		"php/Zend/zend_builtin_functions.c",
+		"php/Zend/zend_sprintf.c",
+		"php/Zend/zend_ini.c",
+		"php/Zend/zend_qsort.c",
+		"php/Zend/zend_objects.c",
+		"php/Zend/zend_object_handlers.c",
+		"php/Zend/zend_objects_API.c",
+		"php/Zend/zend_ts_hash.c",
+		"php/Zend/zend_stream.c",
+		"php/Zend/zend_default_classes.c",
+		"php/Zend/zend_iterators.c",
+		"php/Zend/zend_interfaces.c",
+		"php/Zend/zend_exceptions.c",
+		"php/Zend/zend_strtod.c",
+		"php/Zend/zend_closures.c",
+		"php/Zend/zend_float.c",
+		"php/Zend/zend_string.c",
+		"php/Zend/zend_signal.c",
+		"php/Zend/zend_generators.c",
+		"php/Zend/zend_gc.c",
+		"php/Zend/zend_multibyte.c"
+	];
 	requires [targets("configure")];
 	rule "lib";
 	tag "zend";
