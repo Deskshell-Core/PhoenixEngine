@@ -22,9 +22,6 @@
 [submodule "build"]
 	path = build
 	url = https://github.com/IngwiePhoenix/build.git
-[submodule "libbu"]
-	path = libbu
-	url = https://github.com/eichlan/libbu.git
 [submodule "libcanister"]
 	path = libcanister
 	url = https://github.com/coder543/libcanister.git
@@ -34,9 +31,6 @@
 [submodule "re2c"]
 	path = re2c
 	url = git://git.code.sf.net/p/re2c/code-git
-[submodule "libucl"]
-	path = libucl
-	url = https://github.com/vstakhov/libucl.git
 [submodule "php-ext/embed2-sapi"]
 	path = php-ext/embed2-sapi
 	url = https://github.com/basvanbeek/embed2-sapi.git
@@ -61,9 +55,15 @@
 [submodule "curl"]
 	path = curl
 	url = https://github.com/bagder/curl.git
-[submodule "TinyJS"]
-	path = TinyJS
-	url = https://github.com/pochi0701/TinyJS.git
 [submodule "cDetect"]
 	path = cDetect
 	url = https://github.com/IngwiePhoenix/cDetect.git
+[submodule "asbind"]
+	path = asbind
+	url = https://github.com/cutepig/asbind.git
+[submodule "IceTea"]
+	path = IceTea
+	url = https://github.com/IngwiePhoenix/IceTea.git
+[submodule "brightray"]
+	path = brightray
+	url = https://github.com/brightray/brightray.git

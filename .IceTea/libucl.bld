@@ -1,9 +1,0 @@
-CFLAGS += " -Ilibucl/include";
-CXXFLAGS += " -Ilibucl/include";
-
-target OUT+"/libucl.a" {
-	CFLAGS += " -Ilibucl/src -Ilibucl/uthash";
-	input [files("libucl/src/*.c")];
-	rule "lib";
-	tag "libucl";
-}

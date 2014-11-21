@@ -1,0 +1,64 @@
+@project "Phoenix Engine"
+@author "Ingwie Phoenix <ingwie2000@gmail.com>"
+@version "0.0.1"
+
+@! <%
+    for(i,v in glob(".IceTea/*.it")) {
+        IceTea.include(v);
+    }
+%>;
+
+@target "PhoenixEngine" {
+    needs = [
+        tag("php5"),
+        tag("angelscript-all"), 
+        tag("sqlite"), 
+        "chromiumcontent",
+        "brightray",
+        "config4cpp",
+        tag("ttvfs"),
+        tag("curl"),
+        tag("archive"),
+        "FLTK",
+        tag("nodejs-lib")
+    ];
+    type = "Framework";
+    framework {
+        infoPlist = "PhoenixEngine/Info.plist";
+        resources = "PhoenixEngine/Resources";
+        versioned = false;
+        headers_from_flags = true;
+        copy_dependencies = true;
+    }
+    shared_library {
+        whole_archive = true;
+    }
+    input = [
+        "PhoenixEngine/common/*.cpp",
+        "PhoenixEngine/browser/*.cpp",
+        "PhoenixEngine/renderer/*.cpp",
+        "PhoenixEngine/content/*.cpp"
+    ];
+}
+
+@target "Firelight" {
+    needs = ["PhoenixEngine"];
+    type = "App";
+    app {
+        infoPlist = "Firelight/Info.plist";
+        resources = "Firelight/Resources";
+    }
+    input = ["Firelight/src/*.cpp"];
+    on.postbuild = <%
+        fs.copy("Firelight/main.as", OUTPUT_DIR);
+    %>;
+}
+
+@action "all" { build = ["*"]; }
+@action "Firelight" { build = ["Firelight"]; }
+@action "PhoenixEngine" { build = ["PhoenixEngine"]; }
+
+@option "--release", "Enable Release building", "yes";
+@! <% if(args("--release") == "yes") {
+    config.add("CXX.defines", ["NDEBIG", "_NDEBUG", "RELEASE"]);
+} %>;
