@@ -1,0 +1,128 @@
+/**
+
+    @author: Ingwie Phoenix <ingwie2000@gmail.com>
+    @desc: This is the buildfile for Phoenix Engine.
+           Please keep in mind, that **ALL** files from $CWD/.IceTea are
+           automatically being included by the engine itself.
+
+*/
+target("PECore", "lib") {
+    input: [
+        // Common - bindings and such.
+        "PhoenixEngine/common/*.cpp",
+        // Renderer stuff.
+        "PhoenixEngine/content/*.cpp",
+        // Browser, main process stuff
+        "PhoenixEngine/browser/*.cpp",
+        // Application runtimes, IPC, etc.
+        "PhoenixEngine/app/*.cpp"
+    ],
+    settings: {
+        CXX: {
+            warnings: {
+                none: true
+            },
+            standard: "c++98",
+            includes: ["PhoenixEngine/"]
+        },
+        LINK: {
+            strip_all: true
+        }
+    },
+    requires: [
+            "curl",
+            "libcanister",
+            "ttvfs"
+        ] + tag("angelscript")
+        + tag("as-ext")
+        + tag("php")
+        + tag("php-ext")
+        + tag("uv")
+        + tag("sqlite")
+        + tag("nodejs-lib")
+        + tag("brightray")
+        + tag("chromium_content"),
+    exports: {
+        // Global exports for all platforms.
+        CXX: {
+            includes: ["PhoenixEngine/"]
+        },
+        LINK: {
+            libraries: ["PhoenixEngine"],
+            // Quickly generate the libraryname. PREFIX is the install prefix.
+            library_path: "$(PREFIX)/"..libName("PhoenixEngine")
+        }
+        INSTALL: {
+            headers: [
+                // Dir : Headers.
+                {"PhoenixEngine/common/":  ["PhoenixEngine/common/*.h"]},
+                {"PhoenixEngine/app/":     ["PhoenixEngine/app/*.h"]},
+                {"PhoenixEngine/content/": ["PhoenixEngine/content/*.h"]},
+                {"PhoenixEngine/browser/": ["PhoenixEngine/browser/*.h"]},
+            ]
+        },
+        // Mac OS has: App, Framework, Bundle. Should this trigger in GNUStep too?
+        Framework: {
+            Plist: "PhoenixEngine/PE-Info.plist",
+            Resources: "PhoenixEngine/Resources",
+            // maybe IceTea should automatically figure this out...? Most probably should.
+            library_path: "@rpath/../Frameworks/Phoenix Engine.framework/Phoenix Engine"
+        }
+    },
+    prepare: function() {
+        cli.group "Phoenix Engine";
+        cli.insert {
+            longopt: "--debug",
+            desc: "Build with debug enabled."
+        }
+    },
+    configure: function() {
+        if(cli.get("--debug")) {
+            @CXX.optimization = 3;
+        }
+
+        var conf = include("PhoenixEngine/info.os");
+        for(var k,v in conf) {
+            config.set(k, v);
+        }
+
+        // Looks if *.in exists and generates .in-less version.
+        config.transform("PhoenixEngine/PE-Info.plist");
+    }
+}
+
+target("Phoenix Engine", "osx-framework") {
+    input: ["PhoenixEngine/objc/*.m", "PhoenixEngine/objc/*.mm"],
+    needs: ["PECore"],
+    exports: {
+        INSTALL: {
+            headers: [
+                {"PhoenixEngine/objc/": ["PhoenixEngine/objc/*.h"]}
+            ]
+        }
+    }
+}
+
+target("PhoenixEngine", "shlib") {
+    needs: ["PECore"]
+}
+
+// Implement some test cases
+TestCase = {
+    CXX: {
+        warnings: {
+            error: true
+        }
+    },
+    prepare: function() {
+        for(var v,k in @input) {
+            var dname = fs.dirname(k);
+            if(!dname in @CXX.includes) @CXX.includes += dname;
+        }
+    }
+}
+for(var _,v in fs.getFileList("PhoenixEngine/tests/*.cpp")) {
+    target("test-"..v, "app") extends TestCase {
+        input: [v]
+    }
+}

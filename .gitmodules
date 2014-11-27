@@ -1,12 +1,14 @@
 [submodule "php"]
 	path = php
 	url = https://github.com/php/php-src.git
+	branch = PHP-5.5.14
 [submodule "php-ext/PHP-CPP"]
 	path = php-ext/PHP-CPP
 	url = https://github.com/CopernicaMarketingSoftware/PHP-CPP.git
 [submodule "FLTK"]
 	path = FLTK
 	url = https://github.com/IngwiePhoenix/FLTK.git
+	branch = master
 [submodule "uvpp"]
 	path = uvpp
 	url = https://github.com/larroy/uvpp.git
@@ -16,9 +18,11 @@
 [submodule "Trololo"]
 	path = Trololo
 	url = https://github.com/benvh/Trololo.git
+	branch = master
 [submodule "ttvfs"]
 	path = ttvfs
 	url = https://github.com/fgenesis/ttvfs.git
+	branch = dev
 [submodule "build"]
 	path = build
 	url = https://github.com/IngwiePhoenix/build.git
@@ -31,6 +35,7 @@
 [submodule "re2c"]
 	path = re2c
 	url = git://git.code.sf.net/p/re2c/code-git
+	branch = master
 [submodule "php-ext/embed2-sapi"]
 	path = php-ext/embed2-sapi
 	url = https://github.com/basvanbeek/embed2-sapi.git
@@ -52,18 +57,22 @@
 [submodule "php-ext/operator"]
 	path = php-ext/operator
 	url = https://github.com/php/pecl-php-operator.git
+	branch = master
 [submodule "curl"]
 	path = curl
 	url = https://github.com/bagder/curl.git
 [submodule "cDetect"]
 	path = cDetect
 	url = https://github.com/IngwiePhoenix/cDetect.git
+	branch = master
 [submodule "asbind"]
 	path = asbind
 	url = https://github.com/cutepig/asbind.git
 [submodule "IceTea"]
 	path = IceTea
 	url = https://github.com/IngwiePhoenix/IceTea.git
+	branch = master
 [submodule "brightray"]
 	path = brightray
 	url = https://github.com/brightray/brightray.git
+	branch = master
