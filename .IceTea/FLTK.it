@@ -278,27 +278,30 @@ target("FLTK", "lib") {
             }
             // We want to enable Cairo, and create its target.
             target("fltk_cairo", "lib") {
-                input: pfs.glob(pfs.join(__sourcedir, "FLTK/cairo") "*.cxx"),
+                input: pfs.glob(pfs.join(__sourcedir, "FLTK/cairo"), "*.cxx"),
             }
             @needs[] = "fltk_cairo";
         } else {
+            var enabl = detect.enabled("cairo");
+            var enlib = detect.lib("cairo");
             echo detect.out .. "Cairo was ";
-            if(detect.enabled("cairo"))
-                echo "enabled";
+            if(enabl)
+                echo("enabled");
             else
-                echo "disabled";
-            echo " and could also ";
-            if(detect.lib("cairo"))
-                print "be found.";
+                echo("disabled");
+            echo(" and could also ");
+            if(enlib)
+                print("be found.");
             else
-                print "not be found.";
+                print("not be found.");
         }
 
-        for(var _,hdr in [
+        var headerz = [
             "sys/types.h", "sys/stat.h", "string.h", "memory.h",
             "strings.h", "inttypes.h", "stdint.h", "unistd.h",
             "sys/select.h", "sys/stdtypes.h"
-        ]) detect.header(hdr);
+        ];
+        for(var _,hdr in headerz) { detect.header("c", hdr); }
 
         // Types
         if(detect.type("long long")) {
@@ -308,35 +311,36 @@ target("FLTK", "lib") {
             detect.define("FLTK_LLFMT", "\"%ld\"");
             detect.define("FLTK_LLCAST", "(long)");
         }
+        /*
         for(var _,t in [16, 32, 64]) {
             // And this is why I LOVE scripted feature detection.
             var rt = detect.type("uint${t}_t")
                 || detect.type("uint${t}_t", "stddef.h")
                 || detect.type("uint${t}_t", "inttypes.h");
             if(rt) detect.define("U${t}", "uint${t}_t");
-        }
+        }*/
 
         // ac_header_dirent from autoconf.c...
         // posix-y dirent detection...
-        detect.func("scandir");
+        detect.func("c", "scandir");
         var rt = detect.tryBuild(
             "#include <dirent.h>\n"
             .."int func (const char *d, dirent ***list, void *sort) {\n"
             .."int n = scandir(d, list, 0, (int(*)(const dirent **, const dirent **))sort);\n"
-            .."}\n"
+            .."}\n", "C"
         );
         if(rt) detect.define("HAVE_SCANDIR_POSIX", "1");
 
         // Functions
-        detect.func("vsnprintf");
-        detect.func("snprintf");
-        detect.func("strcasecmp");
-        detect.func("strlcat");
-        detect.func("strlcpy");
+        detect.func("c", "vsnprintf");
+        detect.func("c", "snprintf");
+        detect.func("c", "strcasecmp");
+        detect.func("c", "strlcat");
+        detect.func("c", "strlcpy");
 
         // Time
-        detect.header("locale.h");
-        detect.func("localeconv");
+        detect.header("c", "locale.h");
+        detect.func("c", "localeconv");
 
         // Math (my never-really-liked class at school.)
         detect.libfunc("m", "pow");
@@ -344,7 +348,7 @@ target("FLTK", "lib") {
         // dl*()
         detect.libfunc("dl", "dlsym");
         detect.libfunc("dl", "dlopen");
-        detect.header("dlfcn.h");
+        detect.header("c", "dlfcn.h");
 
         // Local libraries
         for(var _,lb in ["jpeg", "png"]) {
@@ -382,7 +386,7 @@ target("FLTK", "lib") {
         }
 
         // Threading
-        detect.header("pthread.h");
+        detect.header("c","pthread.h");
         var ptname;
         if(detect.lib("pthread")) {
             ptname = "pthread";
@@ -396,18 +400,19 @@ target("FLTK", "lib") {
 
         // Graphics
         var s,e,o = $("uname");
+        o[1] = o[1].trim();
         if(sys.type == "unix" && o[1] == "Darwin") {
             // OS X is really easy on this.
-            detect.define("HAVE_GL", "1");
-            detect.header("GL/glut.h");
-            detect.header("OpenGL/glut.h");
+            //detect.define("HAVE_GL", "1");
+            detect.header("c","GL/glut.h");
+            detect.header("c","OpenGL/glut.h");
             // OS X is rather predictive here.
             @settings.LINK.flags[] = "-framework AGL";
             @settings.LINK.flags[] = "-framework OpenGL";
             @settings.LINK.flags[] = "-framework ApplicationServices";
         } else {
             // Generic check
-            detect.header("GL/gl.h")
+            detect.header("c","GL/gl.h")
                 && (detect.lib("GL") || detect.lib("gl"))
                 && detect.define("HAVE_GL", "1");
             detect.header("GL/glut.h");
@@ -439,6 +444,7 @@ target("FLTK", "lib") {
         // Detect endianess...
 
         // Generic macros
+        /*
         detect.define("FL_MAJOR_VERSION", "1");
         detect.define("FL_MINOR_VERSION", "3");
         detect.define("FL_PATCH_VERSION", "3");
@@ -451,10 +457,15 @@ target("FLTK", "lib") {
         detect.define("BORDER_WIDTH","2");
         if(o[1] == "Darwin")
             detect.define("__APPLE_QUARTZ__", "1");
+        */
+        return true;
 
         pfs.mkdir(pfs.join(__outdir, "FLTK"));
         detect.write_header(pfs.join(__outdir, "FLTK/config.h"));
         @settings.native.include_dirs[] = pfs.join(__outdir, "FLTK/config.h");
+
+        // Should change this later.
+        return true;
     },
     // Create the empty objects
     needs: [],
