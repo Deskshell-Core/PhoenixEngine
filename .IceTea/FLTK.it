@@ -1,0 +1,467 @@
+// FLTK target and build description by Ingwie Phoenix
+
+target("FLTK", "lib") {
+    input: @{
+        var srclist = [
+            "Fl.cxx",
+            "Fl_Adjuster.cxx",
+            "Fl_BMP_Image.cxx",
+            "Fl_Bitmap.cxx",
+            "Fl_Box.cxx",
+            "Fl_Browser.cxx",
+            "Fl_Browser_.cxx",
+            "Fl_Browser_load.cxx",
+            "Fl_Button.cxx",
+            "Fl_Chart.cxx",
+            "Fl_Check_Browser.cxx",
+            "Fl_Check_Button.cxx",
+            "Fl_Choice.cxx",
+            "Fl_Clock.cxx",
+            "Fl_Color_Chooser.cxx",
+            "Fl_Copy_Surface.cxx",
+            "Fl_Counter.cxx",
+            "Fl_Device.cxx",
+            "Fl_Dial.cxx",
+            "Fl_Double_Window.cxx",
+            "Fl_File_Browser.cxx",
+            "Fl_File_Chooser.cxx",
+            "Fl_File_Chooser2.cxx",
+            "Fl_File_Icon.cxx",
+            "Fl_File_Icon2.cxx",
+            "Fl_File_Input.cxx",
+            "Fl_GDI_Printer.cxx",
+            "Fl_GIF_Image.cxx",
+            "Fl_Group.cxx",
+            "Fl_Help_Dialog.cxx",
+            "Fl_Help_Dialog_Dox.cxx",
+            "Fl_Help_View.cxx",
+            "Fl_Image.cxx",
+            "Fl_Image_Surface.cxx",
+            "Fl_Input.cxx",
+            "Fl_Input_.cxx",
+            "Fl_JPEG_Image.cxx",
+            "Fl_Light_Button.cxx",
+            "Fl_Menu.cxx",
+            "Fl_Menu_.cxx",
+            "Fl_Menu_Bar.cxx",
+            "Fl_Menu_Button.cxx",
+            "Fl_Menu_Window.cxx",
+            "Fl_Menu_add.cxx",
+            "Fl_Menu_global.cxx",
+            "Fl_Multi_Label.cxx",
+            "Fl_Native_File_Chooser.cxx",
+            "Fl_Native_File_Chooser_FLTK.cxx",
+            "Fl_Native_File_Chooser_common.cxx",
+            "Fl_Overlay_Window.cxx",
+            "Fl_PNG_Image.cxx",
+            "Fl_PNM_Image.cxx",
+            "Fl_Pack.cxx",
+            "Fl_Paged_Device.cxx",
+            "Fl_Pixmap.cxx",
+            "Fl_Positioner.cxx",
+            "Fl_PostScript.cxx",
+            "Fl_Preferences.cxx",
+            "Fl_Printer.cxx",
+            "Fl_Progress.cxx",
+            "Fl_Repeat_Button.cxx",
+            "Fl_Return_Button.cxx",
+            "Fl_Roller.cxx",
+            "Fl_Round_Button.cxx",
+            "Fl_Scroll.cxx",
+            "Fl_Scrollbar.cxx",
+            "Fl_Shared_Image.cxx",
+            "Fl_Single_Window.cxx",
+            "Fl_Slider.cxx",
+            "Fl_Table.cxx",
+            "Fl_Table_Row.cxx",
+            "Fl_Tabs.cxx",
+            "Fl_Text_Buffer.cxx",
+            "Fl_Text_Display.cxx",
+            "Fl_Text_Editor.cxx",
+            "Fl_Tile.cxx",
+            "Fl_Tiled_Image.cxx",
+            "Fl_Tooltip.cxx",
+            "Fl_Tree.cxx",
+            "Fl_Tree_Item.cxx",
+            "Fl_Tree_Item_Array.cxx",
+            "Fl_Tree_Prefs.cxx",
+            "Fl_Valuator.cxx",
+            "Fl_Value_Input.cxx",
+            "Fl_Value_Output.cxx",
+            "Fl_Value_Slider.cxx",
+            "Fl_Widget.cxx",
+            "Fl_Window.cxx",
+            "Fl_Window_fullscreen.cxx",
+            "Fl_Window_hotspot.cxx",
+            "Fl_Window_iconize.cxx",
+            "Fl_Window_shape.cxx",
+            "Fl_Wizard.cxx",
+            "Fl_XBM_Image.cxx",
+            "Fl_XPM_Image.cxx",
+            "Fl_abort.cxx",
+            "Fl_add_idle.cxx",
+            "Fl_arg.cxx",
+            "Fl_compose.cxx",
+            "Fl_display.cxx",
+            "Fl_get_key.cxx",
+            "Fl_get_system_colors.cxx",
+            "Fl_grab.cxx",
+            "Fl_lock.cxx",
+            "Fl_own_colormap.cxx",
+            "Fl_visual.cxx",
+            "cmap.cxx",
+            "filename_absolute.cxx",
+            "filename_expand.cxx",
+            "filename_ext.cxx",
+            "filename_isdir.cxx",
+            "filename_list.cxx",
+            "filename_match.cxx",
+            "filename_setext.cxx",
+            "fl_arc.cxx",
+            "fl_arci.cxx",
+            "fl_ask.cxx",
+            "fl_boxtype.cxx",
+            "fl_color.cxx",
+            "fl_cursor.cxx",
+            "fl_curve.cxx",
+            "fl_diamond_box.cxx",
+            "fl_dnd.cxx",
+            "fl_draw.cxx",
+            "fl_draw_image.cxx",
+            "fl_draw_pixmap.cxx",
+            "fl_encoding_latin1.cxx",
+            "fl_encoding_mac_roman.cxx",
+            "fl_engraved_label.cxx",
+            "fl_file_dir.cxx",
+            "fl_font.cxx",
+            "fl_font_xft.cxx",
+            "fl_gleam.cxx",
+            "fl_gtk.cxx",
+            "fl_images_core.cxx",
+            "fl_labeltype.cxx",
+            "fl_line_style.cxx",
+            "fl_open_uri.cxx",
+            "fl_oval_box.cxx",
+            "fl_overlay.cxx",
+            "fl_overlay_visual.cxx",
+            "fl_plastic.cxx",
+            "fl_read_image.cxx",
+            "fl_rect.cxx",
+            "fl_round_box.cxx",
+            "fl_rounded_box.cxx",
+            "fl_scroll_area.cxx",
+            "fl_set_font.cxx",
+            "fl_set_fonts.cxx",
+            "fl_set_fonts_xft.cxx",
+            "fl_shadow_box.cxx",
+            "fl_shortcut.cxx",
+            "fl_show_colormap.cxx",
+            "fl_symbols.cxx",
+            "fl_utf8.cxx",
+            "fl_vertex.cxx",
+            "forms_bitmap.cxx",
+            "forms_compatability.cxx",
+            "forms_free.cxx",
+            "forms_fselect.cxx",
+            "forms_pixmap.cxx",
+            "forms_timer.cxx",
+            "freeglut_geometry.cxx",
+            "freeglut_stroke_mono_roman.cxx",
+            "freeglut_stroke_roman.cxx",
+            "freeglut_teapot.cxx",
+            "gl_draw.cxx",
+            "gl_start.cxx",
+            "glut_compatability.cxx",
+            "glut_font.cxx",
+            "print_panel.cxx",
+            "ps_image.cxx",
+            "screen_xywh.cxx"
+        ];
+        var base = pfs.join(__sourcedir, "FLTK");
+        var base = pfs.join(base, "src");
+        for(var i,v in srclist) {
+            srclist[i] = pfs.join(base, srclist[i]);
+        }
+        return srclist;
+    },
+    init: function() {
+        cli.group "FLTK (Fast Light ToolKit)";
+        detect.enable("examples", "Build the examples.");
+        detect.enable("fluid", "Build the FLUID app.");
+        detect.enable("tests", "Build all tests.");
+        detect.enable("forms", "Build the forms library.");
+        detect.enable("fltk-jpeg", "Use internal libjpeg.");
+        detect.enable("fltk-png", "Use internallibpng.");
+        detect.enable("fltk-zlib", "Use internal zlib.");
+
+        // FIXME IceTea needs Cygwin detection.
+        detect.enable("cygwin", "Use Cygwin.");
+
+        detect.enable("x11", "Enable XOrg / X11.");
+        detect.enable("cairo", "Enable use of libcairo.");
+        detect.enable("fltk-cairo", "Enable use of cairo within FLTK.");
+        detect.enable("fltk-gl", "Build OpenGL related classes.");
+        detect.enable("threads", "Enable threading.");
+    },
+    configure: function() {
+        var FLTK={
+            gl: [
+                "Fl_Gl_Choice.cxx",
+                "Fl_Gl_Device_Plugin.cxx",
+                "Fl_Gl_Overlay.cxx",
+                "Fl_Gl_Window.cxx",
+            ],
+            osx: [
+                "fl_set_fonts_mac.cxx",
+                "fl_draw_image_mac.cxx",
+                "fl_read_image_mac.cxx",
+                "fl_color_mac.cxx",
+                "fl_font_mac.cxx",
+                "Fl_get_key_mac.cxx",
+                "Fl_Native_File_Chooser_MAC.mm",
+                "Fl_Quartz_Printer.mm",
+                "Fl_Sys_Menu_Bar.mm",
+                "Fl_cocoa.mm",
+            ],
+            win32: [
+                "fl_set_fonts_win32.cxx",
+                "fl_read_image_win32.cxx",
+                "fl_draw_image_win32.cxx",
+                "fl_dnd_win32.cxx",
+                "fl_color_win32.cxx",
+                "Fl_win32.cxx",
+                "Fl_Native_File_Chooser_WIN32.cxx",
+                "fl_font_win32.cxx",
+                "Fl_get_key_win32.cxx",
+            ],
+            gtk: [
+                "Fl_Native_File_Chooser_GTK.cxx",
+            ],
+            x11: [
+                "fl_set_fonts_x.cxx",
+                "fl_dnd_x.cxx",
+                "fl_font_x.cxx",
+                "Fl_x.cxx",
+            ]
+        };
+        if(sys.type == "unix") {
+            var s,e,o = $("uname");
+            if(o[1] == "Darwin") {
+                @input + FLTK.mac;
+            } else {
+                // See if XOrg is available.
+                // Need proper testing.
+            }
+        } else {
+            // Windoze.
+            @input + FLTK.win32;
+        }
+
+        // Run generic tests
+        if(detect.enabled("cairo") && detect.lib("cairo")) {
+            // Cairo was found and enabled.
+            detect.define("FLTK_USE_CAIRO", "1");
+            detect.define("FLTK_HAVE_CAIRO", "1");
+            if(detect.lib("pixman-1")) {
+                @settings.LINK.libraries[]="pixman-1";
+            }
+            // Cairo might have some flags. Ask pkg-config for them.
+            if(detect.tool("pkg-config")) {
+                var s,e,o = $("pkg-config --cflags cairo");
+                if(s && e==0) {
+                    @settings.CC.flags[] = o[1];
+                } else {
+                    print "> Error: Could not run pkg-config.";
+                }
+            } else {
+                print "> Error: pkg-config not found.";
+            }
+            // We want to enable Cairo, and create its target.
+            target("fltk_cairo", "lib") {
+                input: pfs.glob(pfs.join(__sourcedir, "FLTK/cairo") "*.cxx"),
+            }
+            @needs[] = "fltk_cairo";
+        } else {
+            echo detect.out .. "Cairo was ";
+            if(detect.enabled("cairo"))
+                echo "enabled";
+            else
+                echo "disabled";
+            echo " and could also ";
+            if(detect.lib("cairo"))
+                print "be found.";
+            else
+                print "not be found.";
+        }
+
+        for(var _,hdr in [
+            "sys/types.h", "sys/stat.h", "string.h", "memory.h",
+            "strings.h", "inttypes.h", "stdint.h", "unistd.h",
+            "sys/select.h", "sys/stdtypes.h"
+        ]) detect.header(hdr);
+
+        // Types
+        if(detect.type("long long")) {
+            detect.define("FLTK_LLFMT", "\"%lld\"");
+            detect.define("FLTK_LLCAST", "(long long)");
+        } else {
+            detect.define("FLTK_LLFMT", "\"%ld\"");
+            detect.define("FLTK_LLCAST", "(long)");
+        }
+        for(var _,t in [16, 32, 64]) {
+            // And this is why I LOVE scripted feature detection.
+            var rt = detect.type("uint${t}_t")
+                || detect.type("uint${t}_t", "stddef.h")
+                || detect.type("uint${t}_t", "inttypes.h");
+            if(rt) detect.define("U${t}", "uint${t}_t");
+        }
+
+        // ac_header_dirent from autoconf.c...
+        // posix-y dirent detection...
+        detect.func("scandir");
+        var rt = detect.tryBuild(
+            "#include <dirent.h>\n"
+            .."int func (const char *d, dirent ***list, void *sort) {\n"
+            .."int n = scandir(d, list, 0, (int(*)(const dirent **, const dirent **))sort);\n"
+            .."}\n"
+        );
+        if(rt) detect.define("HAVE_SCANDIR_POSIX", "1");
+
+        // Functions
+        detect.func("vsnprintf");
+        detect.func("snprintf");
+        detect.func("strcasecmp");
+        detect.func("strlcat");
+        detect.func("strlcpy");
+
+        // Time
+        detect.header("locale.h");
+        detect.func("localeconv");
+
+        // Math (my never-really-liked class at school.)
+        detect.libfunc("m", "pow");
+
+        // dl*()
+        detect.libfunc("dl", "dlsym");
+        detect.libfunc("dl", "dlopen");
+        detect.header("dlfcn.h");
+
+        // Local libraries
+        for(var _,lb in ["jpeg", "png"]) {
+            var haveit = detect.lib("${lb}");
+            if(detect.enabled("fltk-${lb}") && !haveit) {
+                // User wants our own jpeg library.
+                target("fltk_${lb}", "lib") {
+                    input: pfs.glob(pfs.join(__srcdir, "FLTK/${lb}"), "*.c"),
+                    my_native: {
+                        include_dirs: [fs.join(__srcdir, "FLTK/${lb}")]
+                    },
+                    settings: { native: @my_native },
+                    exports: { settings: { native: @my_native } },
+                }
+                @needs[] = "fltk_${lb}";
+            } else {
+                @settings.LINK.libraries[] = "${lb}";
+            }
+        }
+        // Zlib
+        var haveit = detect.lib("z");
+        if(detect.enabled("fltk-zlib") && !haveit) {
+            // User wants our own jpeg library.
+            target("fltk_zlib", "lib") {
+                input: pfs.glob(pfs.join(__srcdir, "FLTK/zlib"), "*.c"),
+                my_native: {
+                    include_dirs: [fs.join(__srcdir, "FLTK/zlib")]
+                },
+                settings: { native: @my_native },
+                exports: { settings: { native: @my_native } },
+            }
+            @needs[] = "fltk_zlib";
+        } else {
+            @settings.LINK.libraries[] = "z";
+        }
+
+        // Threading
+        detect.header("pthread.h");
+        var ptname;
+        if(detect.lib("pthread")) {
+            ptname = "pthread";
+            @settings.lINK.libraries[] = "pthread";
+        } else if(detect.lib("pthreads")) {
+            ptname = "pthreads";
+            @settings.lINK.libraries[] = "pthread";
+        }
+        if(detect.libfunc(ptname, "pthread_create"))
+            detect.define("HAVE_PTHREAD", "1");
+
+        // Graphics
+        var s,e,o = $("uname");
+        if(sys.type == "unix" && o[1] == "Darwin") {
+            // OS X is really easy on this.
+            detect.define("HAVE_GL", "1");
+            detect.header("GL/glut.h");
+            detect.header("OpenGL/glut.h");
+            // OS X is rather predictive here.
+            @settings.LINK.flags[] = "-framework AGL";
+            @settings.LINK.flags[] = "-framework OpenGL";
+            @settings.LINK.flags[] = "-framework ApplicationServices";
+        } else {
+            // Generic check
+            detect.header("GL/gl.h")
+                && (detect.lib("GL") || detect.lib("gl"))
+                && detect.define("HAVE_GL", "1");
+            detect.header("GL/glut.h");
+            var glname;
+            if(detect.lib("GL")) {
+                glname = "GL";
+                @settings.LINK.libraries[] = "GL";
+            } else if(detect.lib("gl")) {
+                glname = "gl";
+                @settings.LINK.libraries[] = "gl";
+            }
+            detect.libfunc(glname, "glXGetProcAddressARB");
+        }
+
+        // Almost there. X11 and Fontconfig stuff.
+        if(o[1] != "Darwin" && sys.type != "windows") {
+            // Using the old variable cause I can.
+            if(detect.tool("freetype-config")) {
+                detect.libfunc("fontconfig", "FcPatternCreate");
+                detect.header("X11/Xft/Xft.h");
+                detect.libfunc("Xft", "XftDrawCreate");
+            }
+            detect.header("X11/extensions/Xdbe.h");
+            detect.libfunc("Xext", "XdbeQueryExtension");
+            detect.header("X11/extensions/Xfixes.h");
+            detect.libfunc("Xfixes", "XFixesQueryExtension");
+        }
+
+        // Detect endianess...
+
+        // Generic macros
+        detect.define("FL_MAJOR_VERSION", "1");
+        detect.define("FL_MINOR_VERSION", "3");
+        detect.define("FL_PATCH_VERSION", "3");
+        detect.define("FL_API_VERSION", "1.3");
+
+        // Give FLTK a few infos.
+        detect.define("USE_COLORMAP", "1");
+        detect.define("FLTK_DOCDIR", "\"\"");
+        detect.define("FLTK_DATADIR", "\"\"");
+        detect.define("BORDER_WIDTH","2");
+        if(o[1] == "Darwin")
+            detect.define("__APPLE_QUARTZ__", "1");
+
+        pfs.mkdir(pfs.join(__outdir, "FLTK"));
+        detect.write_header(pfs.join(__outdir, "FLTK/config.h"));
+        @settings.native.include_dirs[] = pfs.join(__outdir, "FLTK/config.h");
+    },
+    // Create the empty objects
+    needs: [],
+    settings: {
+        native: { flags: [], include_dirs: [] },
+        LINK: { libraries: [] },
+        CXX: { flags: [] },
+        CC: { flags: [] }
+    }
+}

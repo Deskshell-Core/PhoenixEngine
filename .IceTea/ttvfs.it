@@ -1,0 +1,39 @@
+target("ttvfs", "lib") {
+    input: []
+        + pfs.glob("ttvfs", "*.cpp")
+        + pfs.glob("ttvfs_cfileapi", "*.cpp")
+        + pfs.glob("ttvfs_zip", "*.c")
+        + pfs.glob("ttvfs_zip", "*.cpp"),
+    settings: {
+        native: {
+            include_dirs: ["ttvfs/", "ttvfs_zip/", "ttvfs_cfileapi/"]
+        }
+    },
+    exports: {
+        settings: {
+            LINK: {
+                libraries: ["out/libttvfs.a"]
+            },
+            native: {
+                include_dirs: ["ttvfs/", "ttvfs_zip/", "ttvfs_cfileapi/"]
+            }
+        }
+    }
+}
+
+for(var _,ex in pfs.glob("examples", "example*.cpp")) {
+    target(pfs.basename(ex), "exe"){
+        input: [ex],
+        needs: ["ttvfs"]
+    }
+}
+
+target("dirlist", "exe") {
+    input: ["examples/dirlist.cpp"],
+    needs: ["ttvfs"]
+}
+
+action("all") {
+    build: ["*"],
+    clean: ["*"]
+}

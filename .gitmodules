@@ -61,10 +61,6 @@
 [submodule "curl"]
 	path = curl
 	url = https://github.com/bagder/curl.git
-[submodule "cDetect"]
-	path = cDetect
-	url = https://github.com/IngwiePhoenix/cDetect.git
-	branch = master
 [submodule "asbind"]
 	path = asbind
 	url = https://github.com/cutepig/asbind.git
@@ -76,3 +72,6 @@
 	path = brightray
 	url = https://github.com/brightray/brightray.git
 	branch = master
+[submodule "objectscript"]
+	path = objectscript
+	url = https://github.com/unitpoint/objectscript.git
