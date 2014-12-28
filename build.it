@@ -6,6 +6,7 @@
            automatically being included by the engine itself.
 
 */
+/*
 target("PECore", "lib") {
     input: [
         // Common - bindings and such.
@@ -106,23 +107,4 @@ target("Phoenix Engine", "osx-framework") {
 target("PhoenixEngine", "shlib") {
     needs: ["PECore"]
 }
-
-// Implement some test cases
-TestCase = {
-    CXX: {
-        warnings: {
-            error: true
-        }
-    },
-    prepare: function() {
-        for(var v,k in @input) {
-            var dname = fs.dirname(k);
-            if(!dname in @CXX.includes) @CXX.includes += dname;
-        }
-    }
-}
-for(var _,v in fs.getFileList("PhoenixEngine/tests/*.cpp")) {
-    target("test-"..v, "app") extends TestCase {
-        input: [v]
-    }
-}
+*/

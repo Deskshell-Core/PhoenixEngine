@@ -62,7 +62,7 @@
 	path = curl
 	url = https://github.com/bagder/curl.git
 [submodule "asbind"]
-	path = asbind
+	path = AngelScript-ext/asbind
 	url = https://github.com/cutepig/asbind.git
 [submodule "IceTea"]
 	path = IceTea
@@ -75,3 +75,6 @@
 [submodule "objectscript"]
 	path = objectscript
 	url = https://github.com/unitpoint/objectscript.git
+[submodule "AngelScript-ext/aatc"]
+	path = AngelScript-ext/aatc
+	url = https://github.com/Sami-Vuorela/aatc.git
