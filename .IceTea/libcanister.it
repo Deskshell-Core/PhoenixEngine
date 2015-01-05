@@ -1,0 +1,29 @@
+target("canister", "lib") {
+    input: [
+        "libcanister/src/bzipWrapper.cpp",
+        "libcanister/src/fileinterpretation.cpp",
+        "libcanister/src/libcanfile.cpp",
+        "libcanister/src/libcanister.cpp",
+        "libcanister/src/libcanmem.cpp"
+    ],
+    settings: {
+        native: {
+            include_dirs: ["libcanister/src"]
+        }
+    },
+    exports: {
+        settings: {
+            native: {
+                include_dirs: ["libcanister/src"]
+            },
+            LINK: {
+                libraries: ["canister", "z"]
+            }
+        }
+    }
+}
+
+/*target("candemo", "exe") {
+    input: ["libcanister/src/canisterdemo.cpp"],
+    needs: ["canister"]
+}*/

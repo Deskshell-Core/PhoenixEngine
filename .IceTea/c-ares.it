@@ -1,0 +1,22 @@
+/*target("c-ares", "lib") {
+    input: pfs.glob("c-ares/src", "*.c"),
+    settings: {
+        native: {
+            include_dirs: ["c-ares/include", "c-ares/src"]
+        }
+    },
+    exports: {
+        settings: {
+            native: {
+                include_dirs: ["c-ares/include"]
+            },
+            LINK: {
+                libraries: ["c-ares"]
+            }
+        }
+    },
+    configure: function() {
+        // Im too tired for this.
+        settings.native.include_dirs[] = "c-ares/config/darwin";
+    }
+}*/

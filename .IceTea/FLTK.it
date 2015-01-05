@@ -50,7 +50,6 @@ target("FLTK", "lib") {
             "Fl_Menu_global.cxx",
             "Fl_Multi_Label.cxx",
             "Fl_Native_File_Chooser.cxx",
-            "Fl_Native_File_Chooser_FLTK.cxx",
             "Fl_Native_File_Chooser_common.cxx",
             "Fl_Overlay_Window.cxx",
             "Fl_PNG_Image.cxx",
@@ -134,7 +133,6 @@ target("FLTK", "lib") {
             "fl_engraved_label.cxx",
             "fl_file_dir.cxx",
             "fl_font.cxx",
-            "fl_font_xft.cxx",
             "fl_gleam.cxx",
             "fl_gtk.cxx",
             "fl_images_core.cxx",
@@ -152,7 +150,6 @@ target("FLTK", "lib") {
             "fl_scroll_area.cxx",
             "fl_set_font.cxx",
             "fl_set_fonts.cxx",
-            "fl_set_fonts_xft.cxx",
             "fl_shadow_box.cxx",
             "fl_shortcut.cxx",
             "fl_show_colormap.cxx",
@@ -173,7 +170,7 @@ target("FLTK", "lib") {
             "gl_start.cxx",
             "glut_compatability.cxx",
             "glut_font.cxx",
-            "print_panel.cxx",
+            //"print_panel.cxx",
             "ps_image.cxx",
             "screen_xywh.cxx"
         ];
@@ -236,12 +233,15 @@ target("FLTK", "lib") {
             ],
             gtk: [
                 "Fl_Native_File_Chooser_GTK.cxx",
+                "Fl_Native_File_Chooser_FLTK.cxx",
             ],
             x11: [
                 "fl_set_fonts_x.cxx",
                 "fl_dnd_x.cxx",
                 "fl_font_x.cxx",
                 "Fl_x.cxx",
+                "fl_font_xft.cxx",
+                "fl_set_fonts_xft.cxx",
             ]
         };
         if(sys.type == "unix") {
@@ -311,17 +311,18 @@ target("FLTK", "lib") {
             detect.define("FLTK_LLFMT", "\"%ld\"");
             detect.define("FLTK_LLCAST", "(long)");
         }
-        /*
+
         for(var _,t in [16, 32, 64]) {
             // And this is why I LOVE scripted feature detection.
             var rt = detect.type("uint${t}_t")
                 || detect.type("uint${t}_t", "stddef.h")
                 || detect.type("uint${t}_t", "inttypes.h");
             if(rt) detect.define("U${t}", "uint${t}_t");
-        }*/
+        }
 
         // ac_header_dirent from autoconf.c...
         // posix-y dirent detection...
+        echo detect.out .. "Checking for a POSIX scandir... "
         detect.func("c", "scandir");
         var rt = detect.tryBuild(
             "#include <dirent.h>\n"
@@ -329,7 +330,12 @@ target("FLTK", "lib") {
             .."int n = scandir(d, list, 0, (int(*)(const dirent **, const dirent **))sort);\n"
             .."}\n", "C"
         );
-        if(rt) detect.define("HAVE_SCANDIR_POSIX", "1");
+        if(rt) {
+            print "Yes."
+            detect.define("HAVE_SCANDIR_POSIX", "1");
+        } else {
+            print "No."
+        }
 
         // Functions
         detect.func("c", "vsnprintf");
@@ -424,6 +430,7 @@ target("FLTK", "lib") {
                 glname = "gl";
                 @settings.LINK.libraries[] = "gl";
             }
+            print "meep gl"
             detect.libfunc(glname, "glXGetProcAddressARB");
         }
 
@@ -444,7 +451,6 @@ target("FLTK", "lib") {
         // Detect endianess...
 
         // Generic macros
-        /*
         detect.define("FL_MAJOR_VERSION", "1");
         detect.define("FL_MINOR_VERSION", "3");
         detect.define("FL_PATCH_VERSION", "3");
@@ -455,14 +461,14 @@ target("FLTK", "lib") {
         detect.define("FLTK_DOCDIR", "\"\"");
         detect.define("FLTK_DATADIR", "\"\"");
         detect.define("BORDER_WIDTH","2");
-        if(o[1] == "Darwin")
+        if(o[1] == "Darwin") {
             detect.define("__APPLE_QUARTZ__", "1");
-        */
-        return true;
+        }
 
-        pfs.mkdir(pfs.join(__outdir, "FLTK"));
-        detect.write_header(pfs.join(__outdir, "FLTK/config.h"));
-        @settings.native.include_dirs[] = pfs.join(__outdir, "FLTK/config.h");
+        var outfile=pfs.join(__outputdir, "FLTK/config.h");
+        pfs.mkdir(pfs.join(__outputdir, "FLTK"));
+        detect.write_header(outfile);
+        @settings.native.include_dirs[] = pfs.join(__outputdir, "FLTK");
 
         // Should change this later.
         return true;
@@ -470,9 +476,9 @@ target("FLTK", "lib") {
     // Create the empty objects
     needs: [],
     settings: {
-        native: { flags: [], include_dirs: [] },
+        native: { flags: [], include_dirs: ["FLTK/", "FLTK/src/"] },
         LINK: { libraries: [] },
-        CXX: { flags: [] },
+        CXX: { flags: [], defines: ["FL_LIBRARY"] },
         CC: { flags: [] }
     }
 }

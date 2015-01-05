@@ -1,0 +1,48 @@
+target("sqlite3", "lib") {
+    input: ["sqlite3/sqlite3.c"],
+    settings: {
+        native: {
+            include_dirs: ["sqlite3"]
+        }
+    },
+    exports: {
+        settings: {
+            native: {
+                include_dirs: ["sqlite3"]
+            },
+            LINK: {
+                libraries: ["sqlite3"]
+            }
+        }
+    }
+}
+
+// Shell
+target("sqlite3_shell", "exe") {
+    input: ["sqlite3/shell.c"],
+    needs: ["sqlite3"]
+}
+
+target("Trololo", "lib") {
+    input: [
+        "Trololo/QueryResult.cc",
+        "Trololo/SqliteDatabase.cc"
+    ],
+    needs: ["sqlite3"],
+    exports: {
+        settings: {
+            native: {
+                include_dirs: ["Trololo"]
+            },
+            LINK: {
+                // FIXME: Ensure that libraries are built before this target.
+                libraries: ["Trololo", "sqlite3"]
+            },
+        },
+    }
+}
+
+target("Trololo_test", "exe") {
+    input: ["Trololo/test.cc"],
+    needs: ["Trololo"]
+}

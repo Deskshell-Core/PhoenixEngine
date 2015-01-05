@@ -1,36 +1,43 @@
 target("ttvfs", "lib") {
     input: []
-        + pfs.glob("ttvfs", "*.cpp")
-        + pfs.glob("ttvfs_cfileapi", "*.cpp")
-        + pfs.glob("ttvfs_zip", "*.c")
-        + pfs.glob("ttvfs_zip", "*.cpp"),
+        + pfs.glob("ttvfs/ttvfs", "*.cpp")
+        + pfs.glob("ttvfs/ttvfs_cfileapi", "*.cpp")
+        + pfs.glob("ttvfs/ttvfs_zip", "*.c")
+        + pfs.glob("ttvfs/ttvfs_zip", "*.cpp"),
     settings: {
         native: {
-            include_dirs: ["ttvfs/", "ttvfs_zip/", "ttvfs_cfileapi/"]
+            include_dirs: ["ttvfs/ttvfs/", "ttvfs/ttvfs_zip/", "ttvfs/ttvfs_cfileapi/"]
         }
     },
     exports: {
         settings: {
-            LINK: {
-                libraries: ["out/libttvfs.a"]
-            },
             native: {
-                include_dirs: ["ttvfs/", "ttvfs_zip/", "ttvfs_cfileapi/"]
+                include_dirs: ["ttvfs/ttvfs/", "ttvfs/ttvfs_zip/", "ttvfs/ttvfs_cfileapi/"]
             }
         }
     }
 }
 
-for(var _,ex in pfs.glob("examples", "example*.cpp")) {
-    target(pfs.basename(ex), "exe"){
+for(var _,ex in pfs.glob("ttvfs/examples", "example*.cpp")) {
+    target("ttvfs_"..pfs.basename(ex), "exe")({
         input: [ex],
-        needs: ["ttvfs"]
-    }
+        needs: ["ttvfs"],
+        settings: {
+            LINK: {
+                libraries: ["out/libttvfs.a"]
+            }
+        }
+    });
 }
 
-target("dirlist", "exe") {
-    input: ["examples/dirlist.cpp"],
-    needs: ["ttvfs"]
+target("ttvfs_dirlist", "exe") {
+    input: ["ttvfs/examples/dirlist.cpp"],
+    needs: ["ttvfs"],
+    settings: {
+        LINK: {
+            libraries: ["out/libttvfs.a"]
+        }
+    }
 }
 
 action("all") {
