@@ -1,0 +1,140 @@
+var asdir = "AngelScript/sdk";
+target("AngelScript", "lib") {
+    input: @{
+        var list = [
+            "as_atomic.cpp",
+            "as_builder.cpp",
+            "as_bytecode.cpp",
+            "as_compiler.cpp",
+            "as_configgroup.cpp",
+            "as_context.cpp",
+            "as_datatype.cpp",
+            "as_gc.cpp",
+            "as_generic.cpp",
+            "as_globalproperty.cpp",
+            "as_memory.cpp",
+            "as_module.cpp",
+            "as_objecttype.cpp",
+            "as_outputbuffer.cpp",
+            "as_parser.cpp",
+            "as_restore.cpp",
+            "as_scriptcode.cpp",
+            "as_scriptengine.cpp",
+            "as_scriptfunction.cpp",
+            "as_scriptnode.cpp",
+            "as_scriptobject.cpp",
+            "as_string.cpp",
+            "as_string_util.cpp",
+            "as_thread.cpp",
+            "as_tokenizer.cpp",
+            "as_typeinfo.cpp",
+            "as_variablescope.cpp",
+            // A special file that needs extra worry.
+            "as_callfunc.cpp"
+        ];
+        for(var i,f in list) {
+            list[i] = pfs.join(asdir, pfs.join("angelscript/source", f));
+        }
+        return list;
+    },
+    init: function() {
+        cli.group "AngelScript";
+        var dirlist = pfs.getDirList(pfs.join(asdir,"add_on"));
+        @extlist = [];
+        for(var _,extdir in dirlist) {
+            var ename = pfs.basename(extdir);
+            var rename = ename.replace("script","");
+            @extlist[] = ename;
+            detect.enable("as-${rename}", "Build the ${rename} AngelScript add-on.");
+        }
+    },
+    configure: function() {
+        echo detect.out .. "Checking which as_callfunc to use... ";
+        var list = @input;
+        var cf = {
+            arm:            "as_callfunc_arm.cpp",
+            mips:           "as_callfunc_mips.cpp",
+            ppc:            "as_callfunc_ppc.cpp",
+            ppc64:          "as_callfunc_ppc_64.cpp",
+            sh4:            "as_callfunc_sh4.cpp",
+            x64_gcc:        "as_callfunc_x64_gcc.cpp",
+            x64_mingw:      "as_callfunc_x64_mingw.cpp",
+            x64_msvc:       "as_callfunc_x64_msvc.cpp",
+            x86:            "as_callfunc_x86.cpp",
+            xenon:          "as_callfunc_xenon.cpp",
+            // Assembly files
+            arm_msvc:       "as_callfunc_arm_msvc.asm",
+            x64_msvc_asm:   "as_callfunc_x64_msvc_asm.asm",
+            arm_gcc:        "as_callfunc_arm_gcc.S",
+            arm_vita:       "as_callfunc_arm_vita.S",
+            arm_xcode:      "as_callfunc_arm_xcode.S"
+        }
+
+        // Platform-dependent query
+        // FIXME: I need a way to cross-platform test the CPU.
+        // ...at runtime.
+        var file = "";
+        if(sys.type == "windows") {
+            if(detect.tool("cl")) {
+                // MSVC
+                print "Windows MSVC (${cf.x64_msvc})";
+                file = cf.x64_msvc;
+                // An exception.
+                list[] = cf.x64_msvc_asm;
+            } else if(detect.tool("mingw32-gcc")) {
+                // We are able to use a MinGW GCC. So what arch are we?
+                var e,s,o = $("uname -m");
+                if(o[1].trim().indexOf("64") != -1) {
+                    print "Windows MinGW (${cf.x64_mingw})"
+                    file = cf.x64_mingw;
+                }
+            }
+        } else {
+            // We are on a Unix maschine, so dig it up.
+            var e,s,o = $("uname");
+            var uname = o[1].trim();
+            var e2,s2,o2 = $("uname -m");
+            var arch = o2[1].trim();
+            if(uname == "Darwin") {
+                if(arch == "x86_64") {
+                    print "Mac OS X (Intel based) (${cf.x64_gcc})"
+                    // Easy.
+                    file = cf.x64_gcc;
+                } else if(arch == "ppc") {
+                    print "Mac OS X (PowerPC) (${cf.ppc})"
+                    // Is that the correct name, actually?
+                    file = cf.ppc;
+                } else if(arch == "ppc64") {
+                    print "Mac OS X (PowerPC 64-Bit) (${cf.ppc64})"
+                    file = cf.ppc64;
+                }
+                // What is the uname -m result for a Intel32?
+            } else {
+                // Some GNU/Linux or BSD target
+                if(typeOf(cf[arch]) == "string") {
+                    print "Generic Linux (Using: ${arch} -> ${cf[arch]})";
+                    file = cf[arch];
+                } else {
+                    print "Generic Linux (No architecture fits. C++ backend used.)"
+                    @settings.CXX.defines[] = "AS_MAX_PORTABILITY";
+                    @export.settings.CXX.defines[] = "AS_MAX_PORTABILITY";
+                }
+            }
+        }
+        // Add it:
+        if(file != "") list[] = pfs.join(asdir, pfs.join("angelscript/source", file));
+        @input = list;
+        return true;
+    },
+    settings: {
+        CXX: {
+            include_dirs: pfs.join(asdir, "include")
+        }
+    },
+    exports: @settings
+}
+
+action("build-as") {
+    build: ["AngelScript"],
+    clean: ["AngelScript"]
+}

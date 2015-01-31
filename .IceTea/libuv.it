@@ -1,0 +1,165 @@
+var utils = require("utils");
+target("UV", "lib") {
+    input: utils.sourceTree(pfs.join("libuv","src"), [
+        "fs-poll.c",
+        "inet.c",
+        "threadpool.c",
+        "uv-common.c",
+        "version.c",
+    ] + (sys.type == "unix" ? [
+        "unix/async.c",
+        "unix/core.c",
+        "unix/dl.c",
+        "unix/fs.c",
+        "unix/fsevents.c",
+        "unix/getaddrinfo.c",
+        "unix/getnameinfo.c",
+        "unix/kqueue.c",
+        "unix/loop-watcher.c",
+        "unix/loop.c",
+        "unix/pipe.c",
+        "unix/poll.c",
+        "unix/process.c",
+        "unix/proctitle.c",
+        "unix/pthread-fixes.c",
+        "unix/signal.c",
+        "unix/stream.c",
+        "unix/tcp.c",
+        "unix/thread.c",
+        "unix/timer.c",
+        "unix/tty.c",
+        "unix/udp.c",
+    ] : [
+        "win/async.c",
+        "win/core.c",
+        "win/dl.c",
+        "win/error.c",
+        "win/fs-event.c",
+        "win/fs.c",
+        "win/getaddrinfo.c",
+        "win/getnameinfo.c",
+        "win/handle.c",
+        "win/loop-watcher.c",
+        "win/pipe.c",
+        "win/poll.c",
+        "win/process-stdio.c",
+        "win/process.c",
+        "win/req.c",
+        "win/signal.c",
+        "win/stream.c",
+        "win/tcp.c",
+        "win/thread.c",
+        "win/timer.c",
+        "win/tty.c",
+        "win/udp.c",
+        "win/util.c",
+        "win/winapi.c",
+        "win/winsock.c"
+    ])),
+    init: function() {},
+    configure: function() {
+        var src = {
+            aix: ["libuv/src/unix/aix.c"],
+            android: ["libuv/src/unix/android-ifaddrs.c"],
+            osx: [
+                "libuv/src/unix/darwin-proctitle.c",
+                "libuv/src/unix/darwin.c"
+            ],
+            freebsd: ["libuv/src/unix/freebsd.c"],
+            netbsd: ["libuv/src/unix/netbsd.c"],
+            openbsd: ["libuv/src/unix/openbsd.c"],
+            sunos: ["libuv/src/unix/sunos.c"],
+            linux: [
+                "libuv/src/unix/linux-core.c",
+                "libuv/src/unix/linux-inotify.c",
+                "libuv/src/unix/linux-syscalls.c"
+            ]
+        };
+
+        echo detect.out .. "Determining the platform details... ";
+        if(sys.type == "windows") {
+            print "Windows";
+            // No additional sources here.
+        } else {
+            var e,s,o = $("uname")
+            if(o[1].trim() == "Darwin") {
+                print "Apple Mac OS X";
+                @input + src.osx;
+            } else {
+                echo "Linux, ";
+                @input + src.linux;
+
+                // FIXME: I need proper detection for this section.
+                switch(o[1].trim().toLower()) {
+                    case "aix":
+                        print "AIX";
+                        @input + src.aix;
+                        break;
+                    case "freebsd":
+                        print "FreeBSD";
+                        @input + src.freebsd;
+                        break;
+                    case "openbsd":
+                        print "OpenBSD";
+                        @input + src.openbsd;
+                        break;
+                    case "sunos":
+                        print "Sun Solaris";
+                        @input + src.sunos;
+                        break;
+                    case "android":
+                        print "Google Android";
+                        @input + src.android;
+                        break;
+                }
+            }
+        }
+
+        // Now to work out config.h. Its easy.
+        var libs = @exports.settings.LINK.libraries;
+        detect.libfunc("dl", "dlopen")
+            && libs[] = "dl";
+        detect.libfunc("kstat", "kstat_lookup")
+            && libs[] = "kstat";
+        detect.libfunc("kvm", "kvm_open")
+            && libs[] = "kvm";
+        detect.libfunc("nsl", "gethostbyname")
+            && libs[] = "nsl";
+        detect.libfunc("perfstat", "perfstat_cpu")
+            && libs[] = "perfstat";
+        detect.libfunc("pthread", "pthread_mutex_init")
+            && libs[] = "pthread";
+        detect.libfunc("rt", "clock_gettime")
+            && libs[] = "rt";
+        detect.libfunc("sendfile", "sendfile")
+            && libs[] = "sendfile";
+        detect.libfunc("socket", "socket")
+            && libs[] = "socket";
+
+        // make it if it doesnt exist
+        pfs.mkdirp(pfs.join(__sourcedir, "out/libuv"));
+
+        detect.write_header("out/libuv/config.h");
+        @settings.native.defines[] = "HAVE_CONFIG_H";
+        @settings.native.include_dirs[] = "out/libuv";
+    },
+    settings: {
+        native: {
+            include_dirs: [
+                "libuv/include",
+                // Internal
+                "libuv/src"
+            ] + (sys.type == "unix" ? [
+                "libuv/src/unix"
+            ] : [
+                "libuv/src/win"
+            ])
+        }
+    },
+    exports: {
+        settings: {
+            native: { include_dirs: [ "libuv/include", "uvpp" ] },
+            LINK: { libraries: [] }
+        }
+    }
+}

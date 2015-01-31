@@ -1,0 +1,36 @@
+var stlplus_parts = [
+    "containers", "persistence", "portability", "strings", "subsystems"
+];
+target("STLPlus", "lib") {
+    input: @{
+        var out=[];
+        for(var _,dir in stlplus_parts) {
+            out + pfs.glob("stlplus3/${dir}", "*.cpp")
+        }
+        return out;
+    },
+    settings: {
+        native: {
+            include_dirs: @{
+                var out=[];
+                for(var _,d in stlplus_parts) {
+                    out[] = "stlplus3/${d}";
+                }
+                return out;
+            }
+        }
+    },
+    exports: {
+        settings: {
+            native: {
+                include_dirs: @{
+                    var out=[];
+                    for(var _,d in stlplus_parts) {
+                        out[] = "stlplus3/${d}";
+                    }
+                    return out;
+                }
+            }
+        }
+    }
+}

@@ -1,13 +1,4 @@
-// Helper function
-function make_fltk_srcs(sources) {
-    var base = pfs.join(__sourcedir, "FLTK");
-    var base = pfs.join(base, "src");
-    for(var i,v in sources) {
-        sources[i] = pfs.join(base, sources[i]);
-    }
-    return sources;
-}
-
+var utils = require("utils");
 // FLTK target and build description by Ingwie Phoenix
 target("FLTK", "lib") {
     input: @{
@@ -183,7 +174,7 @@ target("FLTK", "lib") {
             "ps_image.cxx",
             "screen_xywh.cxx"
         ];
-        return make_fltk_srcs(srclist);
+        return utils.sourceTree(pfs.join("FLTK", "src"), srclist);
     },
     init: function() {
         cli.group "FLTK (Fast Light ToolKit)";
@@ -213,16 +204,10 @@ target("FLTK", "lib") {
                 "Fl_Gl_Window.cxx",
             ],
             osx: [
-                //"fl_set_fonts_mac.cxx",
-                //"fl_draw_image_mac.cxx",
-                //"fl_read_image_mac.cxx",
-                //"fl_color_mac.cxx",
-                //"fl_font_mac.cxx",
-                //"Fl_get_key_mac.cxx",
                 "Fl_Native_File_Chooser_MAC.mm",
                 "Fl_Quartz_Printer.mm",
                 "Fl_Sys_Menu_Bar.mm",
-                "Fl_cocoa.mm",
+                "Fl_cocoa.mm"
             ],
             win32: [
                 "fl_set_fonts_win32.cxx",
@@ -248,8 +233,8 @@ target("FLTK", "lib") {
                 "fl_set_fonts_xft.cxx",
             ]
         };
+        var srclist=[];
         if(sys.type == "unix") {
-            var srclist=[];
             var s,e,o = $("uname");
             if(o[1].trim() == "Darwin") {
                 srclist = FLTK.osx;
@@ -261,7 +246,7 @@ target("FLTK", "lib") {
             // Windooze.
             srclist + FLTK.win32;
         }
-        @input + make_fltk_srcs(srclist);
+        @input + utils.sourceTree(pfs.join("FLTK","src"), srclist);
 
         // Run generic tests
         if(detect.enabled("cairo") && detect.lib("cairo")) {

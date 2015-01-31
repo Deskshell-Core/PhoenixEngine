@@ -78,3 +78,6 @@
 [submodule "AngelScript-ext/aatc"]
 	path = AngelScript-ext/aatc
 	url = https://github.com/Sami-Vuorela/aatc.git
+[submodule "AngelScript"]
+	path = AngelScript
+	url = https://github.com/IngwiePhoenix/AngelScript.git
