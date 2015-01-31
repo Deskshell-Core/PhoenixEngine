@@ -9,6 +9,9 @@ target("canister", "lib") {
     settings: {
         native: {
             include_dirs: ["libcanister/src"]
+        },
+        CXX: {
+            warnings: (sys.type == "unix" ? ["no-#warnings"] : [])
         }
     },
     exports: {

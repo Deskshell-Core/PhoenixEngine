@@ -18,7 +18,7 @@ target("ttvfs", "lib") {
     }
 }
 
-for(var _,ex in pfs.glob("ttvfs/examples", "example*.cpp")) {
+/*for(var _,ex in pfs.glob("ttvfs/examples", "example*.cpp")) {
     target("ttvfs_"..pfs.basename(ex), "exe")({
         input: [ex],
         needs: ["ttvfs"],
@@ -38,7 +38,7 @@ target("ttvfs_dirlist", "exe") {
             libraries: ["out/libttvfs.a"]
         }
     }
-}
+}*/
 
 action("all") {
     build: ["*"],

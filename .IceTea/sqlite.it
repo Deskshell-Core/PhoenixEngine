@@ -17,12 +17,6 @@ target("sqlite3", "lib") {
     }
 }
 
-// Shell
-target("sqlite3_shell", "exe") {
-    input: ["sqlite3/shell.c"],
-    needs: ["sqlite3"]
-}
-
 target("Trololo", "lib") {
     input: [
         "Trololo/QueryResult.cc",
@@ -42,7 +36,13 @@ target("Trololo", "lib") {
     }
 }
 
+/*
+target("sqlite3_shell", "exe") {
+    input: ["sqlite3/shell.c"],
+    needs: ["sqlite3"]
+}
 target("Trololo_test", "exe") {
     input: ["Trololo/test.cc"],
     needs: ["Trololo"]
 }
+*/

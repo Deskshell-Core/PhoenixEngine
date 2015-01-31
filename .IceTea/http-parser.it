@@ -1,7 +1,6 @@
 target("http_parser", "lib") {
     input: ["http-parser/http_parser.c"],
     configure: function() {
-        print "ovo"
         return true;
     },
     settings: {

@@ -1,5 +1,14 @@
-// FLTK target and build description by Ingwie Phoenix
+// Helper function
+function make_fltk_srcs(sources) {
+    var base = pfs.join(__sourcedir, "FLTK");
+    var base = pfs.join(base, "src");
+    for(var i,v in sources) {
+        sources[i] = pfs.join(base, sources[i]);
+    }
+    return sources;
+}
 
+// FLTK target and build description by Ingwie Phoenix
 target("FLTK", "lib") {
     input: @{
         var srclist = [
@@ -174,31 +183,26 @@ target("FLTK", "lib") {
             "ps_image.cxx",
             "screen_xywh.cxx"
         ];
-        var base = pfs.join(__sourcedir, "FLTK");
-        var base = pfs.join(base, "src");
-        for(var i,v in srclist) {
-            srclist[i] = pfs.join(base, srclist[i]);
-        }
-        return srclist;
+        return make_fltk_srcs(srclist);
     },
     init: function() {
         cli.group "FLTK (Fast Light ToolKit)";
-        detect.enable("examples", "Build the examples.");
-        detect.enable("fluid", "Build the FLUID app.");
-        detect.enable("tests", "Build all tests.");
-        detect.enable("forms", "Build the forms library.");
+        detect.enable("fltk-examples", "Build the examples.");
+        detect.enable("fltk-fluid", "Build the FLUID app.");
+        detect.enable("fltk-tests", "Build all tests.");
+        detect.enable("fltk-forms", "Build the forms library.");
         detect.enable("fltk-jpeg", "Use internal libjpeg.");
         detect.enable("fltk-png", "Use internallibpng.");
         detect.enable("fltk-zlib", "Use internal zlib.");
 
         // FIXME IceTea needs Cygwin detection.
-        detect.enable("cygwin", "Use Cygwin.");
+        detect.enable("fltk-cygwin", "Use Cygwin.");
 
-        detect.enable("x11", "Enable XOrg / X11.");
+        detect.enable("fltk-x11", "Enable XOrg / X11.");
         detect.enable("cairo", "Enable use of libcairo.");
         detect.enable("fltk-cairo", "Enable use of cairo within FLTK.");
         detect.enable("fltk-gl", "Build OpenGL related classes.");
-        detect.enable("threads", "Enable threading.");
+        detect.enable("fltk-threads", "Enable threading support.");
     },
     configure: function() {
         var FLTK={
@@ -209,12 +213,12 @@ target("FLTK", "lib") {
                 "Fl_Gl_Window.cxx",
             ],
             osx: [
-                "fl_set_fonts_mac.cxx",
-                "fl_draw_image_mac.cxx",
-                "fl_read_image_mac.cxx",
-                "fl_color_mac.cxx",
-                "fl_font_mac.cxx",
-                "Fl_get_key_mac.cxx",
+                //"fl_set_fonts_mac.cxx",
+                //"fl_draw_image_mac.cxx",
+                //"fl_read_image_mac.cxx",
+                //"fl_color_mac.cxx",
+                //"fl_font_mac.cxx",
+                //"Fl_get_key_mac.cxx",
                 "Fl_Native_File_Chooser_MAC.mm",
                 "Fl_Quartz_Printer.mm",
                 "Fl_Sys_Menu_Bar.mm",
@@ -245,17 +249,19 @@ target("FLTK", "lib") {
             ]
         };
         if(sys.type == "unix") {
+            var srclist=[];
             var s,e,o = $("uname");
-            if(o[1] == "Darwin") {
-                @input + FLTK.mac;
+            if(o[1].trim() == "Darwin") {
+                srclist = FLTK.osx;
             } else {
                 // See if XOrg is available.
                 // Need proper testing.
             }
         } else {
-            // Windoze.
-            @input + FLTK.win32;
+            // Windooze.
+            srclist + FLTK.win32;
         }
+        @input + make_fltk_srcs(srclist);
 
         // Run generic tests
         if(detect.enabled("cairo") && detect.lib("cairo")) {
@@ -322,8 +328,9 @@ target("FLTK", "lib") {
 
         // ac_header_dirent from autoconf.c...
         // posix-y dirent detection...
-        echo detect.out .. "Checking for a POSIX scandir... "
+        detect.compiler("c"); // Otherwise this will look awkward.
         detect.func("c", "scandir");
+        echo detect.out .. "Checking for a POSIX scandir... "
         var rt = detect.tryBuild(
             "#include <dirent.h>\n"
             .."int func (const char *d, dirent ***list, void *sort) {\n"
@@ -476,9 +483,22 @@ target("FLTK", "lib") {
     // Create the empty objects
     needs: [],
     settings: {
-        native: { flags: [], include_dirs: ["FLTK/", "FLTK/src/"] },
+        native: {
+            flags: [],
+            include_dirs: ["FLTK/", "FLTK/src/"],
+            defines: ["FL_LIBRARY"],
+            warnings: (sys.type == "unix" ? ["no-deprecated-declarations"] : [])
+        },
+        // If they are not set, then we can not extend them either.
         LINK: { libraries: [] },
-        CXX: { flags: [], defines: ["FL_LIBRARY"] },
-        CC: { flags: [] }
+        CXX: { flags: [] },
+        CC: { flags: [] },
+    },
+    export: {
+        settings: {
+            native: {
+                include_dirs: ["FLTK/"]
+            }
+        }
     }
 }

@@ -1,0 +1,29 @@
+target("ObjectScript", "lib") {
+    input: [
+        "objectscript/src/objectscript.cpp",
+        "objectscript/src/os-heap.cpp"
+    ],
+    init: function() {
+        // We have several extensions that we can try to do.
+        cli.group "ObjectScript";
+        var dirlist = pfs.glob(pfs.join(__sourcedir,"objectscript/src"), "ext-*");
+        @extlist = [];
+        for(var _,extdir in dirlist) {
+            var ename = pfs.basename(extdir);
+            var rename = ename.replace("ext-","");
+            @extlist[] = ename;
+            detect.enable("os-${rename}", "Build the ${rename} ObjectScript extension.")
+        }
+    },
+    settings: {
+        CXX: {
+            include_dirs: ["objectscript/src"],
+            warnings: (sys.type=="unix"?["no-switch"]:[])
+        }
+    },
+    export: {
+        settings: {
+            CXX: { include_dirs: ["objectscript/src"] }
+        }
+    }
+}
