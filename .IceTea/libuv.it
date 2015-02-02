@@ -1,5 +1,6 @@
-var utils = require("utils");
+require "utils";
 target("UV", "lib") {
+    tag: "libuv",
     input: utils.sourceTree(pfs.join("libuv","src"), [
         "fs-poll.c",
         "inet.c",
@@ -137,11 +138,12 @@ target("UV", "lib") {
             && libs[] = "socket";
 
         // make it if it doesnt exist
-        pfs.mkdirp(pfs.join(__sourcedir, "out/libuv"));
+        pfs.mkdir("out/libuv");
 
-        detect.write_header("out/libuv/config.h");
         @settings.native.defines[] = "HAVE_CONFIG_H";
         @settings.native.include_dirs[] = "out/libuv";
+        detect.write_header("out/libuv/config.h");
+        return true;
     },
     settings: {
         native: {

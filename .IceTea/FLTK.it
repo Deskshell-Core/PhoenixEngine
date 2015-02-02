@@ -1,4 +1,5 @@
-var utils = require("utils");
+// Get the utils module
+require "utils";
 // FLTK target and build description by Ingwie Phoenix
 target("FLTK", "lib") {
     input: @{
@@ -483,7 +484,24 @@ target("FLTK", "lib") {
         settings: {
             native: {
                 include_dirs: ["FLTK/"]
+            },
+            LINK: {
+                libraries: ["FLTK"]
             }
         }
     }
 }
+
+// FLTK examples
+// FIXME: Tags would totally help.
+/* FIXME: Dependency tracking needs to improve first.
+var fltk_ex=[];
+for(var _,exname in pfs.glob("FLTK/examples", "*.cxx")) {
+    var tname = pfs.basename(exname);
+    fltk_ex[]=tname;
+    target(tname, "exe") {
+        needs: ["FLTK"],
+        input: [exname]
+    }
+}
+*/

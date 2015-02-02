@@ -1,20 +1,9 @@
 target("ObjectScript", "lib") {
+    tag: "objectscript",
     input: [
         "objectscript/src/objectscript.cpp",
         "objectscript/src/os-heap.cpp"
     ],
-    init: function() {
-        // We have several extensions that we can try to do.
-        cli.group "ObjectScript";
-        var dirlist = pfs.glob(pfs.join(__sourcedir,"objectscript/src"), "ext-*");
-        @extlist = [];
-        for(var _,extdir in dirlist) {
-            var ename = pfs.basename(extdir);
-            var rename = ename.replace("ext-","");
-            @extlist[] = ename;
-            detect.enable("os-${rename}", "Build the ${rename} ObjectScript extension.")
-        }
-    },
     settings: {
         CXX: {
             include_dirs: ["objectscript/src"],
@@ -24,6 +13,53 @@ target("ObjectScript", "lib") {
     export: {
         settings: {
             CXX: { include_dirs: ["objectscript/src"] }
+        },
+        LINK: {
+            libraries: ["ObjectScript"]
+        }
+    }
+}
+
+// ObjectScript extensions
+// A few of them can be considered "STL-like"
+
+// These are simple *.cpp files
+var ext = ["base64", "filesystem", "json", "process", "url"];
+for(var _,en in ext) {
+    target("ObjectScript_ext-${en}", "lib") {
+        tag: "objectscript",
+        input: pfs.glob("objectscript/src/ext-${en}", "*.cpp"),
+        settings: {
+            CXX: {
+                include_dirs: ["objectscript/src/ext-${en}"]
+            }
+        },
+        export: {
+            settings: {
+                CXX: {
+                    include_dirs: ["objectscript/src/ext-${en}"]
+                }
+            }
+        }
+    }
+}
+
+// Now for the complicated ones.
+target("ObjectScript_ext-hashlib", "lib") {
+    tag: "objectscript",
+    input: ["objectscript/src/ext-hashlib/os-hashlib.cpp"]
+        + pfs.glob("objectscript/src/ext-hashlib/crc32","*.c")
+        + pfs.glob("objectscript/src/ext-hashlib/des","*.cpp")
+        + pfs.glob("objectscript/src/ext-hashlib/md5","*.cpp")
+        + pfs.glob("objectscript/src/ext-hashlib/sha","*.cpp"),
+    export: {
+        settings: {
+            CXX: {
+                include_dirs: ["objectscript/src/ext-hashlib"]
+            },
+            LINK: {
+                libraries: ["ObjectScript_ext-hashlib"]
+            }
         }
     }
 }

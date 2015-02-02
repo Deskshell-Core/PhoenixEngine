@@ -1,5 +1,6 @@
 var asdir = "AngelScript/sdk";
 target("AngelScript", "lib") {
+    tag: "angelscript",
     input: @{
         var list = [
             "as_atomic.cpp",
@@ -38,6 +39,7 @@ target("AngelScript", "lib") {
         return list;
     },
     init: function() {
+        /*
         cli.group "AngelScript";
         var dirlist = pfs.getDirList(pfs.join(asdir,"add_on"));
         @extlist = [];
@@ -47,6 +49,7 @@ target("AngelScript", "lib") {
             @extlist[] = ename;
             detect.enable("as-${rename}", "Build the ${rename} AngelScript add-on.");
         }
+        */
     },
     configure: function() {
         echo detect.out .. "Checking which as_callfunc to use... ";
@@ -128,10 +131,73 @@ target("AngelScript", "lib") {
     },
     settings: {
         CXX: {
-            include_dirs: pfs.join(asdir, "include")
+            include_dirs: pfs.join(asdir, "angelscript/include")
         }
     },
-    exports: @settings
+    exports: {
+        settings: {
+            CXX: {
+                include_dirs: pfs.join(asdir, "angelscript/include")
+            },
+            LINK: {
+                libraries: ["AngelScript"]
+            }
+        }
+    }
+}
+
+/* FIXME: It has a config.hpp? O.o well...crap. I need a workaround.
+target("as-aatc", "lib") {
+    needs: ["AngelScript"],
+    tag: "angelscript",
+    input: pfs.glob("AngelScript-ext/aatc/source","*.cpp"),
+    settings: {
+        CXX: {
+            include_dirs: ["AngelScript-ext/aatc/source"]
+        }
+    },
+    exports: {
+        settings: {
+            CXX: {
+                include_dirs: ["AngelScript-ext/aatc/source"]
+            },
+            LINK: {
+                libraries: ["as-aatc"]
+            }
+        }
+    }
+}*/
+
+// build-in addons
+var dirlist = pfs.getDirList(pfs.join(asdir,"add_on"));
+var skip = ["autowrapper"];
+for(var _,en in dirlist) {
+    if(en in skip) {
+        // FIXME: Implement pseudo-target
+        continue;
+    }
+    var ename = pfs.basename(en).replace("script","");
+    en = pfs.join("${asdir}/add_on", en);
+    target("AngelScript_ext-${ename}", "lib") {
+        tag: "angelscript",
+        input: pfs.glob(en, "*.cpp"),
+        //needs: ["AngelScript"],
+        settings: {
+            CXX: {
+                include_dirs: [en, pfs.join(asdir, "angelscript/include")]
+            }
+        },
+        export: {
+            settings: {
+                CXX: {
+                    include_dirs: [en]
+                },
+                LINK: {
+                    libraries: ["AngelScript_ext-${ename}"]
+                }
+            }
+        }
+    }
 }
 
 action("build-as") {

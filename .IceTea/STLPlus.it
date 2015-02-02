@@ -23,13 +23,8 @@ target("STLPlus", "lib") {
     exports: {
         settings: {
             native: {
-                include_dirs: @{
-                    var out=[];
-                    for(var _,d in stlplus_parts) {
-                        out[] = "stlplus3/${d}";
-                    }
-                    return out;
-                }
+                // #include <portability/build.hpp> looks nicer.
+                include_dirs: ["stlplus3/"]
             }
         }
     }
