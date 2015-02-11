@@ -1,5 +1,7 @@
 # Phoenix Engine
 
+[![Join the chat at https://gitter.im/Deskshell-Core/PhoenixEngine](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/Deskshell-Core/PhoenixEngine?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 This is going to be a project that allows you to take your favorite technologies to the desktop - in a way, that you did not think about.
 
 
