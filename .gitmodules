@@ -81,3 +81,6 @@
 [submodule "AngelScript"]
 	path = AngelScript
 	url = https://github.com/IngwiePhoenix/AngelScript.git
+[submodule "v8pp"]
+	path = v8pp
+	url = https://github.com/pmed/v8pp.git
