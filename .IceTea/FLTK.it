@@ -1,5 +1,6 @@
 // Get the utils module
 require "utils";
+
 // FLTK target and build description by Ingwie Phoenix
 target("FLTK", "lib") {
     input: @{
@@ -240,7 +241,7 @@ target("FLTK", "lib") {
             if(o[1].trim() == "Darwin") {
                 srclist = FLTK.osx;
             } else {
-                // See if XOrg is available.
+                // See if XOrg.X11 is available.
                 // Need proper testing.
             }
         } else {
@@ -357,7 +358,7 @@ target("FLTK", "lib") {
                 target("fltk_${lb}", "lib") {
                     input: pfs.glob(pfs.join(__srcdir, "FLTK/${lb}"), "*.c"),
                     my_native: {
-                        include_dirs: [fs.join(__srcdir, "FLTK/${lb}")]
+                        includeDirs: [fs.join(__srcdir, "FLTK/${lb}")]
                     },
                     settings: { native: @my_native },
                     exports: { settings: { native: @my_native } },
@@ -374,7 +375,7 @@ target("FLTK", "lib") {
             target("fltk_zlib", "lib") {
                 input: pfs.glob(pfs.join(__srcdir, "FLTK/zlib"), "*.c"),
                 my_native: {
-                    include_dirs: [fs.join(__srcdir, "FLTK/zlib")]
+                    includeDirs: [fs.join(__srcdir, "FLTK/zlib")]
                 },
                 settings: { native: @my_native },
                 exports: { settings: { native: @my_native } },
@@ -389,10 +390,14 @@ target("FLTK", "lib") {
         var ptname;
         if(detect.lib("pthread")) {
             ptname = "pthread";
-            @settings.lINK.libraries[] = "pthread";
+            @settings.LINK.libraries[] = "pthread";
         } else if(detect.lib("pthreads")) {
             ptname = "pthreads";
-            @settings.lINK.libraries[] = "pthread";
+            @settings.LINK.libraries[] = "pthread";
+        } else {
+            // What in the world. Sadface, last option.
+            // FIXME: detect should run arbitary compiler tests.
+            @settings.LINK.flags[] "-pthreads";
         }
         if(detect.libfunc(ptname, "pthread_create"))
             detect.define("HAVE_PTHREAD", "1");
@@ -458,10 +463,11 @@ target("FLTK", "lib") {
             detect.define("__APPLE_QUARTZ__", "1");
         }
 
-        var outfile=pfs.join(__outputdir, "FLTK/config.h");
         pfs.mkdir(pfs.join(__outputdir, "FLTK"));
+        var outfile=pfs.join(__outputdir, "FLTK/config.h").sub(0,-1);
+        print "| Writing FLTK header: ${outfile}"
         detect.write_header(outfile);
-        @settings.native.include_dirs[] = pfs.join(__outputdir, "FLTK");
+        @settings.native.includeDirs[] = pfs.join(__outputdir, "FLTK");
 
         // Should change this later.
         return true;
@@ -471,23 +477,21 @@ target("FLTK", "lib") {
     settings: {
         native: {
             flags: [],
-            include_dirs: ["FLTK/", "FLTK/src/"],
+            includeDirs: ["FLTK/", "FLTK/src/"],
             defines: ["FL_LIBRARY"],
             warnings: (sys.type == "unix" ? ["no-deprecated-declarations"] : [])
         },
         // If they are not set, then we can not extend them either.
-        LINK: { libraries: [] },
+        LINK: { libraries: [], flags: [] },
         CXX: { flags: [] },
         CC: { flags: [] },
     },
     export: {
-        settings: {
-            native: {
-                include_dirs: ["FLTK/"]
-            },
-            LINK: {
-                libraries: ["FLTK"]
-            }
+        native: {
+            includeDirs: ["FLTK/"]
+        },
+        LINK: {
+            libraries: ["FLTK"]
         }
     }
 }

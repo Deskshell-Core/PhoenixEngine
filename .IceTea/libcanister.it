@@ -8,20 +8,18 @@ target("canister", "lib") {
     ],
     settings: {
         native: {
-            include_dirs: ["libcanister/src"]
+            includeDirs: ["libcanister/src"]
         },
         CXX: {
             warnings: (sys.type == "unix" ? ["no-#warnings"] : [])
         }
     },
     exports: {
-        settings: {
-            native: {
-                include_dirs: ["libcanister/src"]
-            },
-            LINK: {
-                libraries: ["canister", "z"]
-            }
+        native: {
+            include_dirs: ["libcanister/src"]
+        },
+        LINK: {
+            libraries: ["canister", "z"]
         }
     }
 }

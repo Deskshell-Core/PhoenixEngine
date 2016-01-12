@@ -11,12 +11,10 @@ target("ObjectScript", "lib") {
         }
     },
     export: {
-        settings: {
-            CXX: { include_dirs: ["objectscript/src"] }
-        },
-        LINK: {
-            libraries: ["ObjectScript"]
-        }
+        CXX: { includeDirs: ["objectscript/src"] }
+    },
+    LINK: {
+        libraries: ["ObjectScript"]
     }
 }
 
@@ -31,14 +29,12 @@ for(var _,en in ext) {
         input: pfs.glob("objectscript/src/ext-${en}", "*.cpp"),
         settings: {
             CXX: {
-                include_dirs: ["objectscript/src/ext-${en}"]
+                includeDirs: ["objectscript/src/ext-${en}"]
             }
         },
         export: {
-            settings: {
-                CXX: {
-                    include_dirs: ["objectscript/src/ext-${en}"]
-                }
+            CXX: {
+                include_dirs: ["objectscript/src/ext-${en}"]
             }
         }
     }
@@ -53,13 +49,11 @@ target("ObjectScript_ext-hashlib", "lib") {
         + pfs.glob("objectscript/src/ext-hashlib/md5","*.cpp")
         + pfs.glob("objectscript/src/ext-hashlib/sha","*.cpp"),
     export: {
-        settings: {
-            CXX: {
-                include_dirs: ["objectscript/src/ext-hashlib"]
-            },
-            LINK: {
-                libraries: ["ObjectScript_ext-hashlib"]
-            }
+        CXX: {
+            include_dirs: ["objectscript/src/ext-hashlib"]
+        },
+        LINK: {
+            libraries: ["ObjectScript_ext-hashlib"]
         }
     }
 }

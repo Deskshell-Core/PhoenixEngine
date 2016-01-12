@@ -9,13 +9,11 @@ target("http_parser", "lib") {
         }
     },
     exports: {
-        settings: {
-            native: {
-                include_dirs: ["http-parser"]
-            },
-            LINK: {
-                libraries: ["out/libhttp_parser.a"]
-            }
+        native: {
+            includeDirs: ["http-parser"]
+        },
+        LINK: {
+            libraries: ["out/libhttp_parser.a"]
         }
     }
 }

@@ -117,7 +117,7 @@ target("UV", "lib") {
         }
 
         // Now to work out config.h. Its easy.
-        var libs = @exports.settings.LINK.libraries;
+        var libs = @exports.LINK.libraries;
         detect.libfunc("dl", "dlopen")
             && libs[] = "dl";
         detect.libfunc("kstat", "kstat_lookup")
@@ -141,13 +141,13 @@ target("UV", "lib") {
         pfs.mkdir("out/libuv");
 
         @settings.native.defines[] = "HAVE_CONFIG_H";
-        @settings.native.include_dirs[] = "out/libuv";
+        @settings.native.includeDirs[] = "out/libuv";
         detect.write_header("out/libuv/config.h");
         return true;
     },
     settings: {
         native: {
-            include_dirs: [
+            includeDirs: [
                 "libuv/include",
                 // Internal
                 "libuv/src"
@@ -155,13 +155,12 @@ target("UV", "lib") {
                 "libuv/src/unix"
             ] : [
                 "libuv/src/win"
-            ])
+            ]),
+            defines: []
         }
     },
     exports: {
-        settings: {
-            native: { include_dirs: [ "libuv/include", "uvpp" ] },
-            LINK: { libraries: [] }
-        }
+        native: { includeDirs: [ "libuv/include", "uvpp" ] },
+        LINK: { libraries: [] }
     }
 }

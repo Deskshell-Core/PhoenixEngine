@@ -1,4 +1,4 @@
-var asdir = "AngelScript/sdk";
+var asdir = "AngelScript/sdk/";
 target("AngelScript", "lib") {
     tag: "angelscript",
     input: @{
@@ -34,7 +34,7 @@ target("AngelScript", "lib") {
             "as_callfunc.cpp"
         ];
         for(var i,f in list) {
-            list[i] = pfs.join(asdir, pfs.join("angelscript/source", f));
+            list[i] = pfs.join(asdir+"angelscript/source", f).sub(0,-1);
         }
         return list;
     },
@@ -125,23 +125,21 @@ target("AngelScript", "lib") {
             }
         }
         // Add it:
-        if(file != "") list[] = pfs.join(asdir, pfs.join("angelscript/source", file));
+        if(file != "") list[] = pfs.join(asdir+"angelscript/source", file).sub(0,-1);
         @input = list;
         return true;
     },
     settings: {
         CXX: {
-            include_dirs: pfs.join(asdir, "angelscript/include")
+            includeDirs: [pfs.join(asdir, "angelscript/include")]
         }
     },
     exports: {
-        settings: {
-            CXX: {
-                include_dirs: pfs.join(asdir, "angelscript/include")
-            },
-            LINK: {
-                libraries: ["AngelScript"]
-            }
+        CXX: {
+            includeDirs: [pfs.join(asdir, "angelscript/include")]
+        },
+        LINK: {
+            libraries: ["AngelScript"]
         }
     }
 }
@@ -184,17 +182,15 @@ for(var _,en in dirlist) {
         //needs: ["AngelScript"],
         settings: {
             CXX: {
-                include_dirs: [en, pfs.join(asdir, "angelscript/include")]
+                includeDirs: [en, pfs.join(asdir, "angelscript/include")]
             }
         },
         export: {
-            settings: {
-                CXX: {
-                    include_dirs: [en]
-                },
-                LINK: {
-                    libraries: ["AngelScript_ext-${ename}"]
-                }
+            CXX: {
+                include_dirs: [en]
+            },
+            LINK: {
+                libraries: ["AngelScript_ext-${ename}"]
             }
         }
     }

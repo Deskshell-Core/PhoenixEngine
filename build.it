@@ -6,23 +6,23 @@
            automatically being included by the engine itself.
 
 */
-/*
+function libName(name) {
+    return "lib${name}";
+}
+
 target("PECore", "lib") {
-    input: [
+    input: []
         // Common - bindings and such.
-        "PhoenixEngine/common/*.cpp",
+        + pfs.glob("PhoenixEngine/common/","*.cpp")
         // Renderer stuff.
-        "PhoenixEngine/content/*.cpp",
+        + pfs.glob("PhoenixEngine/content/","*.cpp")
         // Browser, main process stuff
-        "PhoenixEngine/browser/*.cpp",
+        + pfs.glob("PhoenixEngine/browser/","*.cpp")
         // Application runtimes, IPC, etc.
-        "PhoenixEngine/app/*.cpp"
-    ],
+        + pfs.glob("PhoenixEngine/app/","*.cpp"),
     settings: {
         CXX: {
-            warnings: {
-                none: true
-            },
+            warnings: [],
             standard: "c++98",
             includes: ["PhoenixEngine/"]
         },
@@ -30,29 +30,29 @@ target("PECore", "lib") {
             strip_all: true
         }
     },
-    requires: [
-            "curl",
-            "libcanister",
+    needs: [
+            //"curl",
+            "canister",
             "ttvfs"
-        ] + tag("angelscript")
-        + tag("as-ext")
-        + tag("php")
-        + tag("php-ext")
-        + tag("uv")
-        + tag("sqlite")
-        + tag("nodejs-lib")
-        + tag("brightray")
-        + tag("chromium_content"),
+        ] + IceTea.tag("angelscript")
+        + IceTea.tag("as-ext")
+        + IceTea.tag("php")
+        + IceTea.tag("php-ext")
+        + IceTea.tag("uv")
+        + IceTea.tag("sqlite")
+        + IceTea.tag("nodejs-lib")
+        + IceTea.tag("brightray")
+        + IceTea.tag("chromium_content"),
     exports: {
         // Global exports for all platforms.
         CXX: {
-            includes: ["PhoenixEngine/"]
+            includeDirs: ["PhoenixEngine/"]
         },
         LINK: {
             libraries: ["PhoenixEngine"],
             // Quickly generate the libraryname. PREFIX is the install prefix.
             library_path: "$(PREFIX)/"..libName("PhoenixEngine")
-        }
+        },
         INSTALL: {
             headers: [
                 // Dir : Headers.
@@ -70,28 +70,25 @@ target("PECore", "lib") {
             library_path: "@rpath/../Frameworks/Phoenix Engine.framework/Phoenix Engine"
         }
     },
-    prepare: function() {
-        cli.group "Phoenix Engine";
-        cli.insert {
-            longopt: "--debug",
-            desc: "Build with debug enabled."
-        }
+    init: function() {
+        print "Welcome to Phoenix Engine!"
     },
     configure: function() {
-        if(cli.get("--debug")) {
-            @CXX.optimization = 3;
+        if(cli.check("--debug")) {
+            @settings.CXX.optimization = "none";
         }
 
-        var conf = include("PhoenixEngine/info.os");
+        /*var conf = require("PhoenixEngine/info.os");
         for(var k,v in conf) {
             config.set(k, v);
-        }
+        }*/
 
         // Looks if *.in exists and generates .in-less version.
-        config.transform("PhoenixEngine/PE-Info.plist");
+        //config.transform("PhoenixEngine/PE-Info.plist");
     }
 }
 
+/*
 target("Phoenix Engine", "osx-framework") {
     input: ["PhoenixEngine/objc/*.m", "PhoenixEngine/objc/*.mm"],
     needs: ["PECore"],
@@ -103,8 +100,8 @@ target("Phoenix Engine", "osx-framework") {
         }
     }
 }
+*/
 
 target("PhoenixEngine", "shlib") {
     needs: ["PECore"]
 }
-*/

@@ -2,17 +2,15 @@ target("sqlite3", "lib") {
     input: ["sqlite3/sqlite3.c"],
     settings: {
         native: {
-            include_dirs: ["sqlite3"]
+            includeDirs: ["sqlite3"]
         }
     },
     exports: {
-        settings: {
-            native: {
-                include_dirs: ["sqlite3"]
-            },
-            LINK: {
-                libraries: ["sqlite3"]
-            }
+        native: {
+            includeDirs: ["sqlite3"]
+        },
+        LINK: {
+            libraries: ["sqlite3"]
         }
     }
 }
